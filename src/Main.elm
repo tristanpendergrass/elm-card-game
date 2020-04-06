@@ -15,13 +15,75 @@ main =
 -- MODEL
 
 
+type Ability
+    = None
+    | HealingOne
+    | HealingTwo
+
+
+type alias PlayerCard =
+    { name : String
+    , strength : Int
+    , ability : Ability
+    }
+
+
+type alias EnemyCard =
+    { name : String
+    , strength : Int
+    , draws : Int
+    }
+
+
 type alias Model =
-    String
+    { playedCards : List PlayerCard
+    , playerDeck : List PlayerCard
+    , health : Int
+    , currentEnemy : EnemyCard
+    , enemyDeck : List EnemyCard
+    }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( "Why hello there", Cmd.none )
+    let
+        playerDeck : List PlayerCard
+        playerDeck =
+            [ { name = "Ralph", strength = 2, ability = None }
+            , { name = "Donkey", strength = -1, ability = None }
+            , { name = "Simba", strength = 1, ability = None }
+            , { name = "Xiao Curly", strength = 0, ability = HealingOne }
+            , { name = "Cocoa", strength = 0, ability = None }
+            , { name = "Da YangYang", strength = 0, ability = HealingTwo }
+            , { name = "Ernest", strength = 1, ability = None }
+            , { name = "Sophie", strength = 0, ability = None }
+            , { name = "Tutu", strength = 1, ability = None }
+            , { name = "Panda-kun", strength = 0, ability = None }
+            ]
+
+        firstEnemy : EnemyCard
+        firstEnemy =
+            { name = "Thug", strength = 1, draws = 1 }
+
+        enemyDeck : List EnemyCard
+        enemyDeck =
+            [ { name = "Thug", strength = 1, draws = 1 }
+            , { name = "Thug", strength = 1, draws = 1 }
+            , { name = "Big Thug", strength = 3, draws = 2 }
+            , { name = "Big Thug", strength = 3, draws = 2 }
+            , { name = "Big Thug", strength = 3, draws = 2 }
+            ]
+
+        initModel : Model
+        initModel =
+            { playedCards = []
+            , playerDeck = playerDeck
+            , health = 20
+            , currentEnemy = firstEnemy
+            , enemyDeck = enemyDeck
+            }
+    in
+    ( initModel, Cmd.none )
 
 
 
@@ -29,14 +91,22 @@ init _ =
 
 
 type Msg
-    = HandleThingInput String
+    = EndBattle
+    | DrawCard
+    | ActivateCard PlayerCard
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg _ =
     case msg of
-        HandleThingInput str ->
-            ( str, Cmd.none )
+        EndBattle ->
+            Debug.todo "Code EndBattle"
+
+        DrawCard ->
+            Debug.todo "Code DrawCard"
+
+        ActivateCard card ->
+            Debug.todo "Code ActivateCard"
 
 
 
@@ -55,6 +125,5 @@ subscriptions _ =
 view : Model -> Html Msg
 view model =
     div []
-        [ input [ onInput HandleThingInput, value model ] []
-        , div [] [ text model ]
+        [ div [] [ text "my game" ]
         ]
