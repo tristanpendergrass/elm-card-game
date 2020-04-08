@@ -125,14 +125,7 @@ cardDrawGenerator backupCard deck discard =
             Random.constant { drawnCard = backupCard, newDeck = [], newDiscard = [] }
 
         ( topCard :: cards, _ ) ->
-            Random.map
-                (\drawnCard ->
-                    { drawnCard = drawnCard
-                    , newDeck = List.filter (\x -> x /= drawnCard) deck
-                    , newDiscard = discard
-                    }
-                )
-                (Random.uniform topCard cards)
+            Random.constant { drawnCard = topCard, newDeck = cards, newDiscard = discard }
 
         ( [], cards ) ->
             Random.map
