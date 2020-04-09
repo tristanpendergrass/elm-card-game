@@ -49,16 +49,6 @@ type alias Model =
     }
 
 
-dummyPlayerCard : PlayerCard
-dummyPlayerCard =
-    { name = "Dummy Enemy", strength = 0, ability = None }
-
-
-dummyEnemyCard : EnemyCard
-dummyEnemyCard =
-    { name = "Dummy Enemy", strength = 0, draws = 1 }
-
-
 init : () -> ( Model, Cmd Msg )
 init _ =
     let
@@ -118,26 +108,18 @@ type Msg
     | ActivateCard PlayerCard
 
 
-cardDrawGenerator : a -> List a -> List a -> Random.Generator { drawnCard : a, newDeck : List a, newDiscard : List a }
-cardDrawGenerator backupCard deck discard =
-    case ( deck, discard ) of
-        ( [], [] ) ->
-            Random.constant { drawnCard = backupCard, newDeck = [], newDiscard = [] }
+shuffleNonEmptyList : a -> List a -> Random.Generator ( a, List a )
+shuffleNonEmptyList top rest =
+    Random.map
+        (\shuffled ->
+            case shuffled of
+                [] ->
+                    ( top, rest )
 
-        ( topCard :: cards, _ ) ->
-            Random.constant { drawnCard = topCard, newDeck = cards, newDiscard = discard }
-
-        ( [], cards ) ->
-            Random.map
-                (\shuffledCards ->
-                    case shuffledCards of
-                        [] ->
-                            { drawnCard = backupCard, newDeck = [], newDiscard = [] }
-
-                        topCard :: restCards ->
-                            { drawnCard = topCard, newDeck = restCards, newDiscard = [] }
-                )
-                (Random.List.shuffle cards)
+                shuffledTop :: shuffledRest ->
+                    ( shuffledTop, shuffledRest )
+        )
+        (Random.List.shuffle (top :: rest))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -145,36 +127,58 @@ update msg model =
     case msg of
         EndBattle ->
             let
-                ( { drawnCard, newDeck, newDiscard }, newSeed ) =
-                    Random.step (cardDrawGenerator dummyEnemyCard model.enemyDeck (model.currentEnemy :: model.enemyDiscard)) model.seed
+                enemyDeck =
+                    model.enemyDeck
+
+                enemyDiscard =
+                    model.currentEnemy :: model.enemyDiscard
+
+                modelUpdatedDecks : Model
+                modelUpdatedDecks =
+                    case ( enemyDeck, enemyDiscard ) of
+                        ( [], [] ) ->
+                            model
+
+                        ( topCard :: rest, _ ) ->
+                            { model | currentEnemy = topCard, enemyDeck = rest, enemyDiscard = model.currentEnemy :: model.enemyDiscard }
+
+                        ( [], topCard :: rest ) ->
+                            let
+                                ( ( drawnCard, newDeck ), newSeed ) =
+                                    Random.step (shuffleNonEmptyList topCard rest) model.seed
+                            in
+                            { model | seed = newSeed, currentEnemy = drawnCard, enemyDeck = newDeck, enemyDiscard = [] }
 
                 newModel : Model
                 newModel =
-                    { model
-                        | seed = newSeed
-                        , playedCards = []
+                    { modelUpdatedDecks
+                        | playedCards = []
                         , playerDiscard = List.append model.playerDiscard model.playedCards
                         , health = model.health - model.currentEnemy.strength + List.sum (List.map .strength model.playedCards)
-                        , currentEnemy = drawnCard
-                        , enemyDeck = newDeck
-                        , enemyDiscard = newDiscard
                     }
             in
             ( newModel, Cmd.none )
 
         DrawCard ->
             let
-                ( { drawnCard, newDeck, newDiscard }, newSeed ) =
-                    Random.step (cardDrawGenerator dummyPlayerCard model.playerDeck model.playerDiscard) model.seed
+                { playerDeck, playerDiscard } =
+                    model
 
                 newModel : Model
                 newModel =
-                    { model
-                        | seed = newSeed
-                        , playedCards = drawnCard :: model.playedCards
-                        , playerDeck = newDeck
-                        , playerDiscard = newDiscard
-                    }
+                    case ( playerDeck, playerDiscard ) of
+                        ( [], [] ) ->
+                            model
+
+                        ( topCard :: rest, _ ) ->
+                            { model | playedCards = topCard :: model.playedCards, playerDeck = rest }
+
+                        ( [], topCard :: rest ) ->
+                            let
+                                ( ( drawnCard, newDeck ), newSeed ) =
+                                    Random.step (shuffleNonEmptyList topCard rest) model.seed
+                            in
+                            { model | seed = newSeed, playedCards = drawnCard :: model.playedCards, playerDeck = newDeck, playerDiscard = [] }
             in
             ( newModel, Cmd.none )
 
