@@ -127,35 +127,46 @@ update msg model =
     case msg of
         EndBattle ->
             let
-                enemyDeck =
-                    model.enemyDeck
+                updateEnemyCards : Model -> Model
+                updateEnemyCards oldModel =
+                    let
+                        enemyDeck =
+                            oldModel.enemyDeck
 
-                enemyDiscard =
-                    model.currentEnemy :: model.enemyDiscard
-
-                modelUpdatedDecks : Model
-                modelUpdatedDecks =
+                        enemyDiscard =
+                            oldModel.currentEnemy :: oldModel.enemyDiscard
+                    in
                     case ( enemyDeck, enemyDiscard ) of
                         ( [], [] ) ->
-                            model
+                            oldModel
 
                         ( topCard :: rest, _ ) ->
-                            { model | currentEnemy = topCard, enemyDeck = rest, enemyDiscard = model.currentEnemy :: model.enemyDiscard }
+                            { oldModel | currentEnemy = topCard, enemyDeck = rest, enemyDiscard = enemyDiscard }
 
                         ( [], topCard :: rest ) ->
                             let
                                 ( ( drawnCard, newDeck ), newSeed ) =
-                                    Random.step (shuffleNonEmptyList topCard rest) model.seed
+                                    Random.step (shuffleNonEmptyList topCard rest) oldModel.seed
                             in
-                            { model | seed = newSeed, currentEnemy = drawnCard, enemyDeck = newDeck, enemyDiscard = [] }
+                            { oldModel | seed = newSeed, currentEnemy = drawnCard, enemyDeck = newDeck, enemyDiscard = [] }
+
+                updatePlayerCards : Model -> Model
+                updatePlayerCards oldModel =
+                    { oldModel
+                        | playedCards = []
+                        , playerDiscard = List.append oldModel.playerDiscard oldModel.playedCards
+                    }
+
+                updateHealth : Model -> Model
+                updateHealth oldModel =
+                    { oldModel | health = model.health - model.currentEnemy.strength + List.sum (List.map .strength model.playedCards) }
 
                 newModel : Model
                 newModel =
-                    { modelUpdatedDecks
-                        | playedCards = []
-                        , playerDiscard = List.append model.playerDiscard model.playedCards
-                        , health = model.health - model.currentEnemy.strength + List.sum (List.map .strength model.playedCards)
-                    }
+                    model
+                        |> updateEnemyCards
+                        |> updatePlayerCards
+                        |> updateHealth
             in
             ( newModel, Cmd.none )
 
