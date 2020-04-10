@@ -9,3 +9,34 @@ body {
   background-color: $dark-1;
   color: $light-2;
 }
+
+.player-health-container {
+  border-radius: 5px;
+  border: 1px solid white;
+  background-color: $light-2;
+  display: inline-block;
+  padding: 5px;
+  padding-right: 10px;
+}
+.player-health {
+  display: flex;
+  flex-direction: row;
+
+  .player-health-text {
+    display: flex;
+    color: $dark-1;
+    flex-direction: column;
+    justify-content: center;
+
+    text-align: center;
+    font-weight: bold;
+
+    .morale {
+      font-size: 1.4rem;
+    }
+
+    .health-number {
+      font-size: 2rem;
+    }
+  }
+}

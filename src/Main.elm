@@ -1,8 +1,8 @@
 module Main exposing (main)
 
 import Browser
-import Html exposing (Html, button, div, h1, h2, hr, li, text, ul)
-import Html.Attributes exposing (class)
+import Html exposing (Html, button, div, h1, h2, hr, img, li, span, text, ul)
+import Html.Attributes exposing (class, src)
 import Html.Events exposing (onClick)
 import Random
 import Random.List
@@ -235,10 +235,23 @@ renderPlayerCard playerCard =
     li [] [ text (playerCard.name ++ " (" ++ String.fromInt playerCard.strength ++ ")") ]
 
 
+renderPlayerHealth : Int -> Html Msg
+renderPlayerHealth health =
+    div [ class "player-health-container" ]
+        [ div [ class "player-health" ]
+            [ img [ src "./morale_icon.png" ] []
+            , div [ class "player-health-text" ]
+                [ span [ class "morale" ] [ text "Morale" ]
+                , span [ class "health-number" ] [ text (String.fromInt health) ]
+                ]
+            ]
+        ]
+
+
 renderPlayerContainer : Model -> Html Msg
 renderPlayerContainer model =
     div []
-        [ h2 [] [ text ("Player Health: " ++ String.fromInt model.health) ]
+        [ renderPlayerHealth model.health
         , h2 [] [ text ("Played Cards (total: " ++ String.fromInt (List.sum (List.map .strength model.playedCards)) ++ ")") ]
         , button [ onClick EndBattle ] [ text "End Battle" ]
         , button [ onClick DrawCard ] [ text "Summon Hero!" ]
