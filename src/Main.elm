@@ -258,12 +258,14 @@ renderPlayerContainer model =
     div []
         [ renderPlayerHealth model.health
         , h2 [] [ text ("Played Cards (total: " ++ String.fromInt (List.sum (List.map .strength model.playedCards)) ++ ")") ]
-        , renderCardBack
         , button [ onClick DrawCard ] [ text "Summon Hero!" ]
         , button [ onClick EndBattle ] [ text "End Battle" ]
         , ul [] (List.map renderPlayerCard model.playedCards)
         , h2 [] [ text "Player Deck" ]
-        , ul [] (List.map renderPlayerCard model.playerDeck)
+        , div [ class "player-deck-container" ]
+            [ div [ class "player-deck-count" ] [ text (String.fromInt (List.length model.playerDeck)) ]
+            , renderCardBack
+            ]
         , h2 [] [ text "Player Discard" ]
         , ul [] (List.map renderPlayerCard model.playerDiscard)
         ]

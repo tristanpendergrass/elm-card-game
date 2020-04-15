@@ -56,11 +56,11 @@ body {
 }
 
 .player-card {
-  $player-card-width: 200px;
-  $player-card-height: 300px;
+  $width: 200px;
+  $height: 300px;
 
-  width: $player-card-width;
-  height: $player-card-height;
+  width: $width;
+  height: $height;
   display: flex;
   border: 1px solid black;
   border-radius: 8px;
@@ -69,7 +69,26 @@ body {
   justify-content: center;
 
   img {
-    width: 0.8 * $player-card-width;
-    height: 0.8 * $player-card-width;
+    width: 0.8 * $width;
+    height: 0.8 * $width;
+  }
+}
+
+.player-deck-container {
+  position: relative;
+
+  .player-deck-count {
+    $width: 30px;
+    width: $width;
+    height: $width;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: inline-block;
+    border: 1px solid black;
+    border-radius: $width / 2;
+    text-align: center;
+    line-height: $width;
+    font-weight: bold;
   }
 }
