@@ -72,7 +72,7 @@ init _ =
 
         firstEnemy : EnemyCard
         firstEnemy =
-            { name = "Thug", strength = 1, draws = 1 }
+            { name = "Cigarette Man", strength = 1, draws = 1 }
 
         enemyDeck : List EnemyCard
         enemyDeck =
@@ -210,23 +210,21 @@ subscriptions _ =
 -- VIEW
 
 
-renderEnemyCard : EnemyCard -> Html Msg
-renderEnemyCard card =
-    li [] [ text card.name ]
-
-
-renderEnemyContainer : Model -> Html Msg
-renderEnemyContainer model =
-    div []
-        [ div []
-            [ h2 [] [ text model.currentEnemy.name ]
-            , div [] [ text ("Strength: " ++ String.fromInt model.currentEnemy.strength) ]
-            , div [] [ text ("Draws: " ++ String.fromInt model.currentEnemy.draws) ]
+renderCurrentEnemy : Model -> Html Msg
+renderCurrentEnemy model =
+    let
+        card =
+            model.currentEnemy
+    in
+    div [ class "enemy-card-container" ]
+        [ div [ class "enemy-card-top" ] [ text card.name ]
+        , div [ class "enemy-card-bottom" ]
+            [ img [ class "enemy-card-picture", src "./cigarette_man.png" ] []
+            , div [ class "enemy-card-info" ]
+                [ div [] [ text ("Stength: " ++ String.fromInt card.strength) ]
+                , div [] [ text ("Draws: " ++ String.fromInt card.draws) ]
+                ]
             ]
-        , h2 [] [ text "Enemy Deck" ]
-        , ul [] (List.map renderEnemyCard model.enemyDeck)
-        , h2 [] [ text "Enemy Discard" ]
-        , ul [] (List.map renderEnemyCard model.enemyDiscard)
         ]
 
 
@@ -248,13 +246,21 @@ renderPlayerHealth health =
         ]
 
 
+renderCardBack : Html Msg
+renderCardBack =
+    div [ class "player-card" ]
+        [ img [ src "./army_icon.png" ] []
+        ]
+
+
 renderPlayerContainer : Model -> Html Msg
 renderPlayerContainer model =
     div []
         [ renderPlayerHealth model.health
         , h2 [] [ text ("Played Cards (total: " ++ String.fromInt (List.sum (List.map .strength model.playedCards)) ++ ")") ]
-        , button [ onClick EndBattle ] [ text "End Battle" ]
+        , renderCardBack
         , button [ onClick DrawCard ] [ text "Summon Hero!" ]
+        , button [ onClick EndBattle ] [ text "End Battle" ]
         , ul [] (List.map renderPlayerCard model.playedCards)
         , h2 [] [ text "Player Deck" ]
         , ul [] (List.map renderPlayerCard model.playerDeck)
@@ -268,7 +274,7 @@ view model =
     div [ class "main-container" ]
         [ div [ class "page-title" ] [ h1 [] [ text "Maplereach" ] ]
         , hr [] []
-        , div [ class "enemy-container" ] [ renderEnemyContainer model ]
+        , div [ class "enemy-container" ] [ renderCurrentEnemy model ]
         , hr [] []
         , div [ class "player-container" ] [ renderPlayerContainer model ]
         ]

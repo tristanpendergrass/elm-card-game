@@ -1,31 +1,24 @@
-$dark-1: #3c1518;
-$dark-2: #69140e;
-$neutral: #a44200;
-$light-2: #d58936;
-$light-1: #fff94f;
-
 body {
   font-size: 12px;
   font-family: Arial, Helvetica, sans-serif;
-  background-color: $dark-1;
-  color: $light-2;
+  color: black;
 }
 
 .player-health-container {
   border-radius: 5px;
   border: 1px solid white;
-  background-color: $light-2;
+  background-color: #faa916;
   display: inline-block;
   padding: 5px;
   padding-right: 10px;
 }
+
 .player-health {
   display: flex;
   flex-direction: row;
 
   .player-health-text {
     display: flex;
-    color: $dark-1;
     flex-direction: column;
     justify-content: center;
 
@@ -39,5 +32,44 @@ body {
     .health-number {
       font-size: 2rem;
     }
+  }
+}
+
+.enemy-card-container {
+  display: inline-block;
+  border: 2px solid black;
+  padding: 5px;
+
+  .enemy-card-top {
+    font-size: 2em;
+  }
+  .enemy-card-bottom {
+    .enemy-card-picture {
+      width: 175px;
+      height: 175px;
+      border: 2px solid black;
+    }
+
+    .enemy-card-info {
+    }
+  }
+}
+
+.player-card {
+  $player-card-width: 200px;
+  $player-card-height: 300px;
+
+  width: $player-card-width;
+  height: $player-card-height;
+  display: flex;
+  border: 1px solid black;
+  border-radius: 8px;
+  padding: 1px;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 0.8 * $player-card-width;
+    height: 0.8 * $player-card-width;
   }
 }
