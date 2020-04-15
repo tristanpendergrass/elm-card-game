@@ -235,8 +235,9 @@ renderPlayerCard playerCard =
 
 renderPlayerHealth : Int -> Html Msg
 renderPlayerHealth health =
-    div [ class "player-health-container" ]
-        [ div [ class "player-health" ]
+    div [ class "player-health-container tooltip" ]
+        [ span [ class "tooltip-text" ] [ text "Lose it all and your guys will get really sad" ]
+        , div [ class "player-health" ]
             [ img [ src "./morale_icon.png" ] []
             , div [ class "player-health-text" ]
                 [ span [ class "morale" ] [ text "Morale" ]
@@ -263,7 +264,10 @@ renderPlayerContainer model =
         , ul [] (List.map renderPlayerCard model.playedCards)
         , h2 [] [ text "Player Deck" ]
         , div [ class "player-deck-container" ]
-            [ div [ class "player-deck-count" ] [ text (String.fromInt (List.length model.playerDeck)) ]
+            [ div [ class "player-deck-count tooltip" ]
+                [ span [] [ text (String.fromInt (List.length model.playerDeck)) ]
+                , span [ class "tooltip-text" ] [ text "Cards in your deck" ]
+                ]
             , renderCardBack
             ]
         , h2 [] [ text "Player Discard" ]

@@ -92,3 +92,33 @@ body {
     font-weight: bold;
   }
 }
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+
+  .tooltip-text {
+    display: inline-block;
+    width: auto;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    padding: 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+    line-height: normal;
+    opacity: 0;
+    transition: opacity 0.3s;
+
+    position: absolute;
+    top: -30px;
+    left: 0;
+    z-index: 1;
+  }
+
+  &:hover {
+    .tooltip-text {
+      opacity: 1;
+    }
+  }
+}
