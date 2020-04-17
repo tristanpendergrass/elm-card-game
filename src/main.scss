@@ -55,7 +55,7 @@ body {
   }
 }
 
-.player-card {
+.card {
   $width: 200px;
   $height: 300px;
 
@@ -74,10 +74,10 @@ body {
   }
 }
 
-.player-deck-container {
+.deck-container {
   position: relative;
 
-  .player-deck-count {
+  .deck-count {
     $width: 30px;
     width: $width;
     height: $width;
@@ -122,4 +122,8 @@ body {
       opacity: 1;
     }
   }
+}
+
+.enemy-container {
+  display: flex;
 }

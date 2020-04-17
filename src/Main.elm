@@ -247,13 +247,6 @@ renderPlayerHealth health =
         ]
 
 
-renderCardBack : Html Msg
-renderCardBack =
-    div [ class "player-card" ]
-        [ img [ src "./army_icon.png" ] []
-        ]
-
-
 renderPlayerContainer : Model -> Html Msg
 renderPlayerContainer model =
     div []
@@ -263,15 +256,38 @@ renderPlayerContainer model =
         , button [ onClick EndBattle ] [ text "End Battle" ]
         , ul [] (List.map renderPlayerCard model.playedCards)
         , h2 [] [ text "Player Deck" ]
-        , div [ class "player-deck-container" ]
-            [ div [ class "player-deck-count tooltip" ]
+        , div [ class "deck-container" ]
+            [ div [ class "deck-count tooltip" ]
                 [ span [] [ text (String.fromInt (List.length model.playerDeck)) ]
                 , span [ class "tooltip-text" ] [ text "Cards in your deck" ]
                 ]
-            , renderCardBack
+            , div [ class "card" ]
+                [ img [ src "./army_icon.png" ] []
+                ]
             ]
         , h2 [] [ text "Player Discard" ]
         , ul [] (List.map renderPlayerCard model.playerDiscard)
+        ]
+
+
+renderEnemyDeck : Model -> Html Msg
+renderEnemyDeck model =
+    div [ class "deck-container" ]
+        [ div [ class "deck-count tooltip" ]
+            [ span [] [ text (String.fromInt (List.length model.enemyDeck)) ]
+            , span [ class "tooltip-text" ] [ text "Cards in your deck" ]
+            ]
+        , div [ class "card" ]
+            [ img [ src "./monster_icon.png" ] []
+            ]
+        ]
+
+
+renderEnemyContainer : Model -> Html Msg
+renderEnemyContainer model =
+    div [ class "enemy-container" ]
+        [ renderEnemyDeck model
+        , renderCurrentEnemy model
         ]
 
 
@@ -280,7 +296,7 @@ view model =
     div [ class "main-container" ]
         [ div [ class "page-title" ] [ h1 [] [ text "Maplereach" ] ]
         , hr [] []
-        , div [ class "enemy-container" ] [ renderCurrentEnemy model ]
+        , div [ class "enemy-container" ] [ renderEnemyContainer model ]
         , hr [] []
         , div [ class "player-container" ] [ renderPlayerContainer model ]
         ]

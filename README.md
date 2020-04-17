@@ -21,6 +21,8 @@ $ npm run build
 
 - [x] Player deck should just show card back with number indicating how many are in deck.
 - [x] Add tooltip libary, with tooltip for number of cards in player deck.
-- [x] Add an icon for monster deck.
-- [ ] Show monster deck same as player deck with card with icon on back and number.
-- [ ] Player cards in play should have actual visuals.
+- [x] Add an icon for enemy deck.
+- [x] Add enemy deck visuals
+- [ ] Add enemy discard visuals
+- [ ] Add player discard visuals
+- [ ] Add player played card visuals
