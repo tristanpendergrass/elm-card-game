@@ -82,14 +82,15 @@ body {
     width: $width;
     height: $width;
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: -5px;
+    left: 5px;
     display: inline-block;
     border: 1px solid black;
     border-radius: $width / 2;
     text-align: center;
     line-height: $width;
     font-weight: bold;
+    background-color: white;
   }
 }
 
