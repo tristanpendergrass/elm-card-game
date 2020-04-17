@@ -23,6 +23,7 @@ $ npm run build
 - [x] Add tooltip libary, with tooltip for number of cards in player deck.
 - [x] Add an icon for enemy deck.
 - [x] Add enemy deck visuals
+- [x] Color code enemy and player card backs
 - [ ] Add enemy discard visuals
 - [ ] Add player discard visuals
 - [ ] Add player played card visuals
