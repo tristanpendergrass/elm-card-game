@@ -27,3 +27,4 @@ $ npm run build
 - [ ] Add enemy discard visuals
 - [ ] Add player discard visuals
 - [ ] Add player played card visuals
+- [ ] Add additional enemy variety

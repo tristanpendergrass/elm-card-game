@@ -210,19 +210,16 @@ subscriptions _ =
 -- VIEW
 
 
-renderCurrentEnemy : Model -> Html Msg
-renderCurrentEnemy model =
-    let
-        card =
-            model.currentEnemy
-    in
-    div [ class "enemy-card-container" ]
-        [ div [ class "enemy-card-top" ] [ text card.name ]
+renderEnemyCard : EnemyCard -> Html Msg
+renderEnemyCard enemy =
+    div [ class "card enemy-card-front" ]
+        [ div [ class "border" ] []
+        , div [ class "enemy-card-top" ] [ text enemy.name ]
         , div [ class "enemy-card-bottom" ]
             [ img [ class "enemy-card-picture", src "./cigarette_man.png" ] []
             , div [ class "enemy-card-info" ]
-                [ div [] [ text ("Stength: " ++ String.fromInt card.strength) ]
-                , div [] [ text ("Draws: " ++ String.fromInt card.draws) ]
+                [ div [] [ text ("Stength: " ++ String.fromInt enemy.strength) ]
+                , div [] [ text ("Draws: " ++ String.fromInt enemy.draws) ]
                 ]
             ]
         ]
@@ -261,7 +258,7 @@ renderPlayerContainer model =
                 [ span [] [ text (String.fromInt (List.length model.playerDeck)) ]
                 , span [ class "tooltip-text" ] [ text "Cards in your deck" ]
                 ]
-            , div [ class "card player-card" ]
+            , div [ class "card card-back player-card" ]
                 [ img [ src "./army_icon.png" ] []
                 ]
             ]
@@ -277,7 +274,7 @@ renderEnemyDeck model =
             [ span [] [ text (String.fromInt (List.length model.enemyDeck)) ]
             , span [ class "tooltip-text" ] [ text "Cards in your deck" ]
             ]
-        , div [ class "card enemy-card" ]
+        , div [ class "card card-back enemy-card" ]
             [ img [ src "./monster_icon.png" ] []
             ]
         ]
@@ -287,7 +284,7 @@ renderEnemyContainer : Model -> Html Msg
 renderEnemyContainer model =
     div [ class "enemy-container" ]
         [ renderEnemyDeck model
-        , renderCurrentEnemy model
+        , renderEnemyCard model.currentEnemy
         ]
 
 
