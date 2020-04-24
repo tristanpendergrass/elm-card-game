@@ -24,7 +24,6 @@ $ npm run build
 - [x] Add an icon for enemy deck.
 - [x] Add enemy deck visuals
 - [x] Color code enemy and player card backs
-- [ ] Add enemy discard visuals
-- [ ] Add player discard visuals
-- [ ] Add player played card visuals
-- [ ] Add additional enemy variety
+- [x] Redo enemy container
+- [ ] Redo player container
+- [ ] Make enemy cards show different pictures

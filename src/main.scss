@@ -7,6 +7,34 @@ body {
   color: black;
 }
 
+.tooltip {
+  position: relative;
+  display: inline-block;
+
+  .tooltip-text {
+    display: none;
+    width: auto;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    padding: 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+    line-height: normal;
+
+    position: absolute;
+    top: -30px;
+    left: 0;
+    z-index: 1;
+  }
+
+  &:hover {
+    .tooltip-text {
+      display: inline-block;
+    }
+  }
+}
+
 .player-health-container {
   border-radius: 5px;
   border: 1px solid white;
@@ -106,7 +134,7 @@ body {
     height: $width;
     position: absolute;
     top: -5px;
-    left: 5px;
+    left: -5px;
     display: inline-block;
     border: 1px solid black;
     border-radius: $width / 2;
@@ -115,38 +143,82 @@ body {
     font-weight: bold;
     background-color: white;
   }
-}
 
-.tooltip {
-  position: relative;
-  display: inline-block;
+  .deck-image {
+    width: 50px;
+    height: 75px;
+    border: 1px solid black;
+    border-radius: 5px;
 
-  .tooltip-text {
-    display: inline-block;
-    width: auto;
-    background-color: #555;
-    color: #fff;
-    text-align: center;
-    padding: 8px;
-    border-radius: 6px;
-    white-space: nowrap;
-    line-height: normal;
-    opacity: 0;
-    transition: opacity 0.3s;
+    &.enemy-deck {
+      background-color: $enemy-color;
+    }
 
-    position: absolute;
-    top: -30px;
-    left: 0;
-    z-index: 1;
-  }
+    &.player-deck {
+      background-color: $player-color;
+    }
 
-  &:hover {
-    .tooltip-text {
-      opacity: 1;
+    img {
+      width: 50px;
+      height: 100px;
+    }
+
+    &.discard {
+      border: 1px dashed black;
+
+      &.enemy-deck {
+        background-color: lighten($enemy-color, 30%);
+      }
+
+      &.player-deck {
+        background-color: lighten($player-color, 30%);
+      }
     }
   }
 }
 
 .enemy-container {
   display: flex;
+  height: 500px;
+}
+
+.info-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  width: 100px;
+  height: 100%;
+  box-sizing: border-box;
+  padding-bottom: 10px;
+
+  > * {
+    margin-bottom: 10px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  width: 200px;
+  height: 100%;
+  box-sizing: border-box;
+  padding-bottom: 10px;
+}
+
+.cards-container {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  justify-content: center;
+  align-items: flex-end;
+  height: 100%;
+  box-sizing: border-box;
+  padding-bottom: 10px;
 }
