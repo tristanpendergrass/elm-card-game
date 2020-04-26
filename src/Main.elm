@@ -210,26 +210,6 @@ subscriptions _ =
 -- VIEW
 
 
-renderEnemyCard : EnemyCard -> Html Msg
-renderEnemyCard enemy =
-    div [ class "card enemy-card-front" ]
-        [ div [ class "border" ] []
-        , div [ class "enemy-card-top" ] [ text enemy.name ]
-        , div [ class "enemy-card-bottom" ]
-            [ img [ class "enemy-card-picture", src "./cigarette_man.png" ] []
-            , div [ class "enemy-card-info" ]
-                [ div [] [ text ("Stength: " ++ String.fromInt enemy.strength) ]
-                , div [] [ text ("Draws: " ++ String.fromInt enemy.draws) ]
-                ]
-            ]
-        ]
-
-
-renderPlayerCard : PlayerCard -> Html Msg
-renderPlayerCard playerCard =
-    li [] [ text (playerCard.name ++ " (" ++ String.fromInt playerCard.strength ++ ")") ]
-
-
 renderPlayerHealth : Int -> Html Msg
 renderPlayerHealth health =
     div [ class "player-health-container tooltip" ]
@@ -244,53 +224,43 @@ renderPlayerHealth health =
         ]
 
 
-renderPlayerContainer : Model -> Html Msg
-renderPlayerContainer model =
-    div []
-        [ renderPlayerHealth model.health
-        , h2 [] [ text ("Played Cards (total: " ++ String.fromInt (List.sum (List.map .strength model.playedCards)) ++ ")") ]
-        , button [ onClick DrawCard ] [ text "Summon Hero!" ]
-        , button [ onClick EndBattle ] [ text "End Battle" ]
-        , ul [] (List.map renderPlayerCard model.playedCards)
-        , h2 [] [ text "Player Deck" ]
-        , div [ class "deck-container" ]
-            [ div [ class "deck-count tooltip" ]
-                [ span [] [ text (String.fromInt (List.length model.playerDeck)) ]
-                , span [ class "tooltip-text" ] [ text "Cards in your deck" ]
-                ]
-            , div [ class "card card-back player-card" ]
-                [ img [ src "./army_icon.png" ] []
-                ]
-            ]
-        , h2 [] [ text "Player Discard" ]
-        , ul [] (List.map renderPlayerCard model.playerDiscard)
-        ]
-
-
-renderEnemyDeck : Int -> Html Msg
-renderEnemyDeck count =
-    div [ class "deck-container" ]
-        [ div [ class "deck-count tooltip" ]
-            [ span [] [ text (String.fromInt count) ]
-            , span [ class "tooltip-text" ] [ text "Cards in enemy deck" ]
-            ]
-        , div [ class "deck-image enemy-deck" ] []
-        ]
-
-
-renderEnemyDiscard : Int -> Html Msg
-renderEnemyDiscard count =
-    div [ class "deck-container" ]
-        [ div [ class "deck-count tooltip" ]
-            [ span [] [ text (String.fromInt count) ]
-            , span [ class "tooltip-text" ] [ text "Cards in enemy discard pile" ]
-            ]
-        , div [ class "deck-image enemy-deck discard" ] []
-        ]
-
-
 renderEnemyContainer : Model -> Html Msg
 renderEnemyContainer model =
+    let
+        renderEnemyDeck : Int -> Html Msg
+        renderEnemyDeck count =
+            div [ class "deck-container" ]
+                [ div [ class "deck-count tooltip" ]
+                    [ span [] [ text (String.fromInt count) ]
+                    , span [ class "tooltip-text" ] [ text "Cards in enemy deck" ]
+                    ]
+                , div [ class "deck-image enemy-deck" ] []
+                ]
+
+        renderEnemyDiscard : Int -> Html Msg
+        renderEnemyDiscard count =
+            div [ class "deck-container" ]
+                [ div [ class "deck-count tooltip" ]
+                    [ span [] [ text (String.fromInt count) ]
+                    , span [ class "tooltip-text" ] [ text "Cards in enemy discard pile" ]
+                    ]
+                , div [ class "deck-image enemy-deck discard" ] []
+                ]
+
+        renderEnemyCard : EnemyCard -> Html Msg
+        renderEnemyCard enemy =
+            div [ class "card enemy-card" ]
+                [ div [ class "border" ] []
+                , div [ class "card-top" ] [ text enemy.name ]
+                , div [ class "card-bottom" ]
+                    [ img [ class "card-picture", src "./cigarette_man.png" ] []
+                    , div [ class "card-info" ]
+                        [ div [] [ text ("Stength: " ++ String.fromInt enemy.strength) ]
+                        , div [] [ text ("Draws: " ++ String.fromInt enemy.draws) ]
+                        ]
+                    ]
+                ]
+    in
     div [ class "enemy-container" ]
         [ div [ class "info-container" ]
             [ renderEnemyDiscard (List.length model.enemyDiscard)
@@ -305,10 +275,58 @@ renderEnemyContainer model =
         ]
 
 
+renderPlayerContainer : Model -> Html Msg
+renderPlayerContainer model =
+    let
+        renderPlayerDeck : Int -> Html Msg
+        renderPlayerDeck count =
+            div [ class "deck-container" ]
+                [ div [ class "deck-count tooltip" ]
+                    [ span [] [ text (String.fromInt count) ]
+                    , span [ class "tooltip-text" ] [ text "Cards in enemy deck" ]
+                    ]
+                , div [ class "deck-image player-deck" ] []
+                ]
+
+        renderPlayerDiscard : Int -> Html Msg
+        renderPlayerDiscard count =
+            div [ class "deck-container" ]
+                [ div [ class "deck-count tooltip" ]
+                    [ span [] [ text (String.fromInt count) ]
+                    , span [ class "tooltip-text" ] [ text "Cards in enemy discard pile" ]
+                    ]
+                , div [ class "deck-image player-deck discard" ] []
+                ]
+
+        renderPlayerCard : PlayerCard -> Html Msg
+        renderPlayerCard playerCard =
+            div [ class "card player-card" ]
+                [ div [ class "border" ] []
+                , div [ class "card-top" ] [ text playerCard.name ]
+                , div [ class "card-bottom" ]
+                    [ img [ class "card-picture", src "./cigarette_man.png" ] []
+                    , div [ class "card-info" ]
+                        [ div [] [ text ("Stength: " ++ String.fromInt playerCard.strength) ]
+                        ]
+                    ]
+                ]
+    in
+    div [ class "player-container" ]
+        [ div [ class "info-container" ]
+            [ renderPlayerDeck (List.length model.playerDeck)
+            , renderPlayerDiscard (List.length model.playerDiscard)
+            ]
+        , div [ class "button-container" ]
+            [ button [ onClick DrawCard ] [ text "Draw Card" ]
+            ]
+        , div [ class "cards-container" ] (List.map renderPlayerCard model.playedCards)
+        ]
+
+
 view : Model -> Html Msg
 view model =
     div [ class "main-container" ]
         [ renderEnemyContainer model
         , hr [] []
-        , div [ class "player-container" ] [ renderPlayerContainer model ]
+        , renderPlayerContainer model
         ]

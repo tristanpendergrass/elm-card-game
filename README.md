@@ -25,5 +25,5 @@ $ npm run build
 - [x] Add enemy deck visuals
 - [x] Color code enemy and player card backs
 - [x] Redo enemy container
-- [ ] Redo player container
+- [x] Redo player container
 - [ ] Make enemy cards show different pictures
