@@ -8,6 +8,27 @@ import Random
 import Random.List
 
 
+playerStrength : Model -> Int
+playerStrength model =
+    model.playedCards
+        |> List.map .strength
+        |> List.sum
+
+
+shuffleNonEmptyList : a -> List a -> Random.Generator ( a, List a )
+shuffleNonEmptyList top rest =
+    Random.map
+        (\shuffled ->
+            case shuffled of
+                [] ->
+                    ( top, rest )
+
+                shuffledTop :: shuffledRest ->
+                    ( shuffledTop, shuffledRest )
+        )
+        (Random.List.shuffle (top :: rest))
+
+
 main : Program () Model Msg
 main =
     Browser.element { init = init, update = update, view = view, subscriptions = subscriptions }
@@ -106,20 +127,6 @@ type Msg
     = EndBattle
     | DrawCard
     | ActivateCard PlayerCard
-
-
-shuffleNonEmptyList : a -> List a -> Random.Generator ( a, List a )
-shuffleNonEmptyList top rest =
-    Random.map
-        (\shuffled ->
-            case shuffled of
-                [] ->
-                    ( top, rest )
-
-                shuffledTop :: shuffledRest ->
-                    ( shuffledTop, shuffledRest )
-        )
-        (Random.List.shuffle (top :: rest))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -260,6 +267,10 @@ renderEnemyContainer model =
                         ]
                     ]
                 ]
+
+        strength : Int
+        strength =
+            model.currentEnemy.strength
     in
     div [ class "enemy-container" ]
         [ div [ class "info-container" ]
@@ -268,6 +279,17 @@ renderEnemyContainer model =
             ]
         , div [ class "button-container" ]
             [ button [ onClick EndBattle ] [ text "End Battle" ]
+            , div
+                [ class "strength"
+                , class
+                    (if strength > 9 || strength < -9 then
+                        "smaller-text"
+
+                     else
+                        ""
+                    )
+                ]
+                [ text (String.fromInt strength) ]
             ]
         , div [ class "cards-container" ]
             [ renderEnemyCard model.currentEnemy
@@ -310,6 +332,10 @@ renderPlayerContainer model =
                         ]
                     ]
                 ]
+
+        strength : Int
+        strength =
+            playerStrength model
     in
     div [ class "player-container" ]
         [ div [ class "info-container" ]
@@ -317,7 +343,18 @@ renderPlayerContainer model =
             , renderPlayerDiscard (List.length model.playerDiscard)
             ]
         , div [ class "button-container" ]
-            [ button [ onClick DrawCard ] [ text "Draw Card" ]
+            [ div
+                [ class "strength"
+                , class
+                    (if strength > 9 || strength < -9 then
+                        "smaller-text"
+
+                     else
+                        ""
+                    )
+                ]
+                [ text (String.fromInt strength) ]
+            , button [ onClick DrawCard ] [ text "Draw Card" ]
             ]
         , div [ class "cards-container" ] (List.map renderPlayerCard model.playedCards)
         ]
@@ -327,6 +364,5 @@ view : Model -> Html Msg
 view model =
     div [ class "main-container" ]
         [ renderEnemyContainer model
-        , hr [] []
         , renderPlayerContainer model
         ]
