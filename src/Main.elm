@@ -279,17 +279,20 @@ renderEnemyContainer model =
             ]
         , div [ class "button-container" ]
             [ button [ onClick EndBattle ] [ text "End Battle" ]
-            , div
-                [ class "strength"
-                , class
-                    (if strength > 9 || strength < -9 then
-                        "smaller-text"
+            , div [ class "tooltip" ]
+                [ div [ class "tooltip-text" ] [ text "Enemy Strength" ]
+                , div
+                    [ class "strength"
+                    , class
+                        (if strength > 9 || strength < -9 then
+                            "smaller-text"
 
-                     else
-                        ""
-                    )
+                         else
+                            ""
+                        )
+                    ]
+                    [ text (String.fromInt strength) ]
                 ]
-                [ text (String.fromInt strength) ]
             ]
         , div [ class "cards-container" ]
             [ renderEnemyCard model.currentEnemy
@@ -343,17 +346,20 @@ renderPlayerContainer model =
             , renderPlayerDiscard (List.length model.playerDiscard)
             ]
         , div [ class "button-container" ]
-            [ div
-                [ class "strength"
-                , class
-                    (if strength > 9 || strength < -9 then
-                        "smaller-text"
+            [ div [ class "tooltip" ]
+                [ div [ class "tooltip-text" ] [ text "Player Strength" ]
+                , div
+                    [ class "strength"
+                    , class
+                        (if strength > 9 || strength < -9 then
+                            "smaller-text"
 
-                     else
-                        ""
-                    )
+                         else
+                            ""
+                        )
+                    ]
+                    [ text (String.fromInt strength) ]
                 ]
-                [ text (String.fromInt strength) ]
             , button [ onClick DrawCard ] [ text "Draw Card" ]
             ]
         , div [ class "cards-container" ] (List.map renderPlayerCard model.playedCards)

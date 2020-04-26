@@ -21,6 +21,7 @@ body {
     border-radius: 6px;
     white-space: nowrap;
     line-height: normal;
+    font-size: 1rem;
 
     position: absolute;
     top: -30px;
@@ -163,7 +164,7 @@ body {
 }
 
 .enemy-container {
-  border-bottom: 1px solid black;
+  border-bottom: 2px solid black;
 }
 
 .info-container {
