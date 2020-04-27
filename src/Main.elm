@@ -83,7 +83,7 @@ init _ =
             [ { name = "Cigarette Man", strength = 2, ability = None, picture = "cigarette_man" }
             , { name = "Finger Guns", strength = 0, ability = None, picture = "finger_guns" }
             , { name = "Spellpeep", strength = 1, ability = None, picture = "spellpeep" }
-            , { name = "The Nose", strength = 0, ability = HealingOne, picture = "the nose" }
+            , { name = "The Nose", strength = 0, ability = HealingOne, picture = "the_nose" }
             ]
 
         firstEnemy : EnemyCard
