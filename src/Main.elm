@@ -68,6 +68,7 @@ type alias Model =
     , currentEnemy : EnemyCard
     , enemyDeck : List EnemyCard
     , enemyDiscard : List EnemyCard
+    , cardsUsed : List PlayerCard
     }
 
 
@@ -82,8 +83,8 @@ init _ =
         playerDeck =
             [ { name = "Cigarette Man", strength = 2, ability = None, picture = "cigarette_man" }
             , { name = "Finger Guns", strength = 0, ability = None, picture = "finger_guns" }
-            , { name = "Spellpeep", strength = 1, ability = None, picture = "spellpeep" }
-            , { name = "The Nose", strength = 0, ability = HealingOne, picture = "the_nose" }
+            , { name = "Spellpeep", strength = 1, ability = HealingOne, picture = "spellpeep" }
+            , { name = "The Nose", strength = 0, ability = HealingTwo, picture = "the_nose" }
             ]
 
         firstEnemy : EnemyCard
@@ -109,6 +110,7 @@ init _ =
             , currentEnemy = firstEnemy
             , enemyDeck = enemyDeck
             , enemyDiscard = []
+            , cardsUsed = []
             }
     in
     ( initModel, Cmd.none )
@@ -196,7 +198,32 @@ update msg model =
             ( newModel, Cmd.none )
 
         ActivateCard card ->
-            ( model, Cmd.none )
+            let
+                updateCardsUsed : Model -> Model
+                updateCardsUsed oldModel =
+                    { oldModel | cardsUsed = card :: oldModel.cardsUsed }
+
+                activateAbility : Model -> Model
+                activateAbility oldModel =
+                    case card.ability of
+                        None ->
+                            oldModel
+
+                        HealingOne ->
+                            { oldModel | health = oldModel.health + 1 }
+
+                        HealingTwo ->
+                            { oldModel | health = oldModel.health + 2 }
+
+                newModel : Model
+                newModel =
+                    if List.member card model.cardsUsed then
+                        model
+
+                    else
+                        model |> updateCardsUsed |> activateAbility
+            in
+            ( newModel, Cmd.none )
 
 
 
@@ -313,6 +340,15 @@ renderPlayerContainer model =
                     [ img [ class "card-picture", src ("./" ++ playerCard.picture ++ ".png") ] []
                     , div [ class "card-info" ]
                         [ div [] [ text ("Stength: " ++ String.fromInt playerCard.strength) ]
+                        , case playerCard.ability of
+                            None ->
+                                div [] []
+
+                            HealingOne ->
+                                div [] [ button [ onClick (ActivateCard playerCard) ] [ text "Heal I" ] ]
+
+                            HealingTwo ->
+                                div [] [ button [ onClick (ActivateCard playerCard) ] [ text "Heal II" ] ]
                         ]
                     ]
                 ]
