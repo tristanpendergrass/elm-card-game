@@ -22,6 +22,7 @@ body {
     white-space: nowrap;
     line-height: normal;
     font-size: 1rem;
+    font-weight: normal;
 
     position: absolute;
     top: -30px;
@@ -160,7 +161,7 @@ body {
 .player-container,
 .enemy-container {
   display: flex;
-  height: 500px;
+  height: 400px;
 }
 
 .enemy-container {
