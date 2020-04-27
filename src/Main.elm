@@ -48,6 +48,7 @@ type alias PlayerCard =
     { name : String
     , strength : Int
     , ability : Ability
+    , picture : String
     }
 
 
@@ -79,16 +80,10 @@ init _ =
 
         playerDeck : List PlayerCard
         playerDeck =
-            [ { name = "Ralph", strength = 2, ability = None }
-            , { name = "Donkey", strength = -1, ability = None }
-            , { name = "Simba", strength = 1, ability = None }
-            , { name = "Xiao Curly", strength = 0, ability = HealingOne }
-            , { name = "Cocoa", strength = 0, ability = None }
-            , { name = "Da YangYang", strength = 0, ability = HealingTwo }
-            , { name = "Ernest", strength = 1, ability = None }
-            , { name = "Sophie", strength = 0, ability = None }
-            , { name = "Tutu", strength = 1, ability = None }
-            , { name = "Panda-kun", strength = 0, ability = None }
+            [ { name = "Cigarette Man", strength = 2, ability = None, picture = "cigarette_man" }
+            , { name = "Finger Guns", strength = 0, ability = None, picture = "finger_guns" }
+            , { name = "Spellpeep", strength = 1, ability = None, picture = "spellpeep" }
+            , { name = "The Nose", strength = 0, ability = HealingOne, picture = "the nose" }
             ]
 
         firstEnemy : EnemyCard
@@ -315,7 +310,7 @@ renderPlayerContainer model =
                 [ div [ class "border" ] []
                 , div [ class "card-top" ] [ text playerCard.name ]
                 , div [ class "card-bottom" ]
-                    [ img [ class "card-picture", src "./cigarette_man.png" ] []
+                    [ img [ class "card-picture", src ("./" ++ playerCard.picture ++ ".png") ] []
                     , div [ class "card-info" ]
                         [ div [] [ text ("Stength: " ++ String.fromInt playerCard.strength) ]
                         ]
