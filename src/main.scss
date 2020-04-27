@@ -5,6 +5,7 @@ body {
   font-size: 12px;
   font-family: Arial, Helvetica, sans-serif;
   color: black;
+  margin: 0;
 }
 
 .tooltip {
@@ -43,27 +44,27 @@ body {
   background-color: $player-color;
   display: inline-block;
   padding: 5px;
-  padding-right: 10px;
-}
 
-.player-health {
-  display: flex;
-  flex-direction: row;
-
-  .player-health-text {
+  .player-health {
     display: flex;
     flex-direction: column;
-    justify-content: center;
 
-    text-align: center;
-    font-weight: bold;
+    .player-health-text {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
 
-    .morale {
-      font-size: 1.4rem;
-    }
+      text-align: center;
+      font-weight: bold;
 
-    .health-number {
-      font-size: 2rem;
+      .morale {
+        font-size: 1.4rem;
+      }
+
+      .health-number {
+        font-size: 2rem;
+      }
     }
   }
 }
@@ -177,6 +178,7 @@ body {
   height: 100%;
   box-sizing: border-box;
   padding: 10px 0;
+  padding-left: 40px;
 
   > * {
     margin-bottom: 10px;

@@ -27,6 +27,6 @@ $ npm run build
 - [x] Redo enemy container
 - [x] Redo player container
 - [x] Add visuals for player and enemy strength
-- [ ] Display player health on left hand side
+- [x] Display player health on left hand side
 - [ ] Add new enemies
 - [ ] Add card art for player cards

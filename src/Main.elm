@@ -217,20 +217,6 @@ subscriptions _ =
 -- VIEW
 
 
-renderPlayerHealth : Int -> Html Msg
-renderPlayerHealth health =
-    div [ class "player-health-container tooltip" ]
-        [ span [ class "tooltip-text" ] [ text "Lose it all and your guys will get really sad" ]
-        , div [ class "player-health" ]
-            [ img [ src "./morale_icon.png" ] []
-            , div [ class "player-health-text" ]
-                [ span [ class "morale" ] [ text "Morale" ]
-                , span [ class "health-number" ] [ text (String.fromInt health) ]
-                ]
-            ]
-        ]
-
-
 renderEnemyContainer : Model -> Html Msg
 renderEnemyContainer model =
     let
@@ -339,11 +325,25 @@ renderPlayerContainer model =
         strength : Int
         strength =
             playerStrength model
+
+        renderPlayerHealth : Int -> Html Msg
+        renderPlayerHealth health =
+            div [ class "player-health-container tooltip" ]
+                [ span [ class "tooltip-text" ] [ text "Lose it all and your guys will get really sad" ]
+                , div [ class "player-health" ]
+                    [ img [ src "./morale_icon.png" ] []
+                    , div [ class "player-health-text" ]
+                        [ div [ class "morale" ] [ text "Morale" ]
+                        , div [ class "health-number" ] [ text (String.fromInt health) ]
+                        ]
+                    ]
+                ]
     in
     div [ class "player-container" ]
         [ div [ class "info-container" ]
             [ renderPlayerDeck (List.length model.playerDeck)
             , renderPlayerDiscard (List.length model.playerDiscard)
+            , renderPlayerHealth model.health
             ]
         , div [ class "button-container" ]
             [ div [ class "tooltip" ]
