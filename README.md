@@ -29,4 +29,9 @@ $ npm run build
 - [x] Add visuals for player and enemy strength
 - [x] Display player health on left hand side
 - [ ] Add new enemies
+- [ ] Icons for strength, draws
 - [ ] Add card art for player cards
+- [ ] Make heal ability work
+- [ ] Add post-battle phase
+- [ ] Let player claim reward in post-battle phase
+- [ ] Let player remove cards in post-battle phase

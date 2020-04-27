@@ -93,15 +93,15 @@ init _ =
 
         firstEnemy : EnemyCard
         firstEnemy =
-            { name = "Cigarette Man", strength = 1, draws = 1 }
+            { name = "Grump", strength = 1, draws = 1 }
 
         enemyDeck : List EnemyCard
         enemyDeck =
-            [ { name = "Thug", strength = 4, draws = 1 }
-            , { name = "Thug", strength = 1, draws = 1 }
-            , { name = "Big Thug", strength = 3, draws = 2 }
-            , { name = "Big Thug", strength = 3, draws = 2 }
-            , { name = "Big Thug", strength = 3, draws = 2 }
+            [ { name = "Grump", strength = 1, draws = 1 }
+            , { name = "Grump", strength = 1, draws = 1 }
+            , { name = "Da Grump", strength = 2, draws = 2 }
+            , { name = "Da Grump", strength = 2, draws = 2 }
+            , { name = "Xiao Grump", strength = 0, draws = 1 }
             ]
 
         initModel : Model
@@ -246,7 +246,7 @@ renderEnemyContainer model =
                 [ div [ class "border" ] []
                 , div [ class "card-top" ] [ text enemy.name ]
                 , div [ class "card-bottom" ]
-                    [ img [ class "card-picture", src "./cigarette_man.png" ] []
+                    [ img [ class "card-picture", src "./monster_icon.png" ] []
                     , div [ class "card-info" ]
                         [ div [] [ text ("Stength: " ++ String.fromInt enemy.strength) ]
                         , div [] [ text ("Draws: " ++ String.fromInt enemy.draws) ]
