@@ -201,7 +201,7 @@ update msg model =
             ( newModel, Cmd.none )
 
         ActivateCard card ->
-            Debug.todo "Code ActivateCard"
+            ( model, Cmd.none )
 
 
 
