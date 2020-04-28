@@ -8,13 +8,6 @@ import Random
 import Random.List
 
 
-playerStrength : Model -> Int
-playerStrength model =
-    model.playedCards
-        |> List.map .strength
-        |> List.sum
-
-
 shuffleNonEmptyList : a -> List a -> Random.Generator ( a, List a )
 shuffleNonEmptyList top rest =
     Random.map
@@ -39,7 +32,7 @@ main =
 
 
 type alias ApplyAbility =
-    Model -> Model
+    FightModel -> FightModel
 
 
 type Ability
@@ -61,16 +54,25 @@ type alias EnemyCard =
     }
 
 
-type alias Model =
+type alias FightModel =
     { seed : Random.Seed
-    , playedCards : List PlayerCard
     , playerDeck : List PlayerCard
     , playerDiscard : List PlayerCard
     , health : Int
-    , currentEnemy : EnemyCard
     , enemyDeck : List EnemyCard
     , enemyDiscard : List EnemyCard
+    , currentEnemy : EnemyCard
     , cardsUsed : List PlayerCard
+    , playedCards : List PlayerCard
+    }
+
+
+type Phase
+    = FightPhase FightModel
+
+
+type alias Model =
+    { phase : Phase
     }
 
 
@@ -114,15 +116,18 @@ init _ =
 
         initModel : Model
         initModel =
-            { seed = initialSeed
-            , playedCards = []
-            , playerDeck = playerDeck
-            , playerDiscard = []
-            , health = 20
-            , currentEnemy = firstEnemy
-            , enemyDeck = enemyDeck
-            , enemyDiscard = []
-            , cardsUsed = []
+            { phase =
+                FightPhase
+                    { seed = initialSeed
+                    , playerDeck = playerDeck
+                    , playerDiscard = []
+                    , health = 20
+                    , enemyDeck = enemyDeck
+                    , enemyDiscard = []
+                    , cardsUsed = []
+                    , currentEnemy = firstEnemy
+                    , playedCards = []
+                    }
             }
     in
     ( initModel, Cmd.none )
@@ -139,100 +144,102 @@ type Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
-        EndBattle ->
-            let
-                updateEnemyCards : Model -> Model
-                updateEnemyCards oldModel =
+update msg topModel =
+    case topModel.phase of
+        FightPhase model ->
+            case msg of
+                EndBattle ->
                     let
-                        enemyDeck =
-                            oldModel.enemyDeck
-
-                        enemyDiscard =
-                            oldModel.currentEnemy :: oldModel.enemyDiscard
-                    in
-                    case ( enemyDeck, enemyDiscard ) of
-                        ( [], [] ) ->
-                            oldModel
-
-                        ( topCard :: rest, _ ) ->
-                            { oldModel | currentEnemy = topCard, enemyDeck = rest, enemyDiscard = enemyDiscard }
-
-                        ( [], topCard :: rest ) ->
+                        updateEnemyCards : FightModel -> FightModel
+                        updateEnemyCards oldModel =
                             let
-                                ( ( drawnCard, newDeck ), newSeed ) =
-                                    Random.step (shuffleNonEmptyList topCard rest) oldModel.seed
+                                enemyDeck =
+                                    oldModel.enemyDeck
+
+                                enemyDiscard =
+                                    oldModel.currentEnemy :: oldModel.enemyDiscard
                             in
-                            { oldModel | seed = newSeed, currentEnemy = drawnCard, enemyDeck = newDeck, enemyDiscard = [] }
+                            case ( enemyDeck, enemyDiscard ) of
+                                ( [], [] ) ->
+                                    oldModel
 
-                updatePlayerCards : Model -> Model
-                updatePlayerCards oldModel =
-                    { oldModel
-                        | playedCards = []
-                        , playerDiscard = List.append oldModel.playerDiscard oldModel.playedCards
-                    }
+                                ( topCard :: rest, _ ) ->
+                                    { oldModel | currentEnemy = topCard, enemyDeck = rest, enemyDiscard = enemyDiscard }
 
-                updateHealth : Model -> Model
-                updateHealth oldModel =
-                    { oldModel | health = model.health - model.currentEnemy.strength + List.sum (List.map .strength model.playedCards) }
+                                ( [], topCard :: rest ) ->
+                                    let
+                                        ( ( drawnCard, newDeck ), newSeed ) =
+                                            Random.step (shuffleNonEmptyList topCard rest) oldModel.seed
+                                    in
+                                    { oldModel | seed = newSeed, currentEnemy = drawnCard, enemyDeck = newDeck, enemyDiscard = [] }
 
-                newModel : Model
-                newModel =
-                    model
-                        |> updateEnemyCards
-                        |> updatePlayerCards
-                        |> updateHealth
-            in
-            ( newModel, Cmd.none )
+                        updatePlayerCards : FightModel -> FightModel
+                        updatePlayerCards oldModel =
+                            { oldModel
+                                | playedCards = []
+                                , playerDiscard = List.append oldModel.playerDiscard oldModel.playedCards
+                            }
 
-        DrawCard ->
-            let
-                { playerDeck, playerDiscard } =
-                    model
+                        updateHealth : FightModel -> FightModel
+                        updateHealth oldModel =
+                            { oldModel | health = model.health - model.currentEnemy.strength + List.sum (List.map .strength model.playedCards) }
 
-                newModel : Model
-                newModel =
-                    case ( playerDeck, playerDiscard ) of
-                        ( [], [] ) ->
+                        newModel : FightModel
+                        newModel =
+                            model
+                                |> updateEnemyCards
+                                |> updatePlayerCards
+                                |> updateHealth
+                    in
+                    ( { topModel | phase = FightPhase newModel }, Cmd.none )
+
+                DrawCard ->
+                    let
+                        { playerDeck, playerDiscard } =
                             model
 
-                        ( topCard :: rest, _ ) ->
-                            { model | playedCards = topCard :: model.playedCards, playerDeck = rest }
+                        newModel : FightModel
+                        newModel =
+                            case ( playerDeck, playerDiscard ) of
+                                ( [], [] ) ->
+                                    model
 
-                        ( [], topCard :: rest ) ->
-                            let
-                                ( ( drawnCard, newDeck ), newSeed ) =
-                                    Random.step (shuffleNonEmptyList topCard rest) model.seed
-                            in
-                            { model | seed = newSeed, playedCards = drawnCard :: model.playedCards, playerDeck = newDeck, playerDiscard = [] }
-            in
-            ( newModel, Cmd.none )
+                                ( topCard :: rest, _ ) ->
+                                    { model | playedCards = topCard :: model.playedCards, playerDeck = rest }
 
-        ActivateCard card ->
-            let
-                updateCardsUsed : Model -> Model
-                updateCardsUsed oldModel =
-                    { oldModel | cardsUsed = card :: oldModel.cardsUsed }
+                                ( [], topCard :: rest ) ->
+                                    let
+                                        ( ( drawnCard, newDeck ), newSeed ) =
+                                            Random.step (shuffleNonEmptyList topCard rest) model.seed
+                                    in
+                                    { model | seed = newSeed, playedCards = drawnCard :: model.playedCards, playerDeck = newDeck, playerDiscard = [] }
+                    in
+                    ( { topModel | phase = FightPhase newModel }, Cmd.none )
 
-                activateAbility : Model -> Model
-                activateAbility oldModel =
-                    case card.ability of
-                        Nothing ->
-                            oldModel
+                ActivateCard card ->
+                    let
+                        updateCardsUsed : FightModel -> FightModel
+                        updateCardsUsed oldModel =
+                            { oldModel | cardsUsed = card :: oldModel.cardsUsed }
 
-                        Just (Ability _ applyAbility) ->
-                            applyAbility oldModel
+                        activateAbility : FightModel -> FightModel
+                        activateAbility oldModel =
+                            case card.ability of
+                                Nothing ->
+                                    oldModel
 
-                newModel : Model
-                newModel =
-                    if List.member card model.cardsUsed then
-                        model
+                                Just (Ability _ applyAbility) ->
+                                    applyAbility oldModel
 
-                    else
-                        model |> updateCardsUsed |> activateAbility
-            in
-            ( newModel, Cmd.none )
+                        newModel : FightModel
+                        newModel =
+                            if List.member card model.cardsUsed then
+                                model
+
+                            else
+                                model |> updateCardsUsed |> activateAbility
+                    in
+                    ( { topModel | phase = FightPhase newModel }, Cmd.none )
 
 
 
@@ -248,7 +255,7 @@ subscriptions _ =
 -- VIEW
 
 
-renderEnemyContainer : Model -> Html Msg
+renderEnemyContainer : FightModel -> Html Msg
 renderEnemyContainer model =
     let
         renderEnemyDeck : Int -> Html Msg
@@ -317,7 +324,7 @@ renderEnemyContainer model =
         ]
 
 
-renderPlayerContainer : Model -> Html Msg
+renderPlayerContainer : FightModel -> Html Msg
 renderPlayerContainer model =
     let
         renderPlayerDeck : Int -> Html Msg
@@ -367,7 +374,9 @@ renderPlayerContainer model =
 
         strength : Int
         strength =
-            playerStrength model
+            model.playedCards
+                |> List.map .strength
+                |> List.sum
 
         renderPlayerHealth : Int -> Html Msg
         renderPlayerHealth health =
@@ -410,8 +419,10 @@ renderPlayerContainer model =
 
 
 view : Model -> Html Msg
-view model =
-    div [ class "main-container" ]
-        [ renderEnemyContainer model
-        , renderPlayerContainer model
-        ]
+view topModel =
+    case topModel.phase of
+        FightPhase model ->
+            div [ class "main-container" ]
+                [ renderEnemyContainer model
+                , renderPlayerContainer model
+                ]
