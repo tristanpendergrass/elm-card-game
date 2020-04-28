@@ -31,7 +31,7 @@ $ npm run build
 - [ ] Icons for strength, draws
 - [x] Add card art for player cards
 - [x] Make heal ability work
-- [ ] Refactor ability to put logic for model change and isDisabled outside of view and update
+- [x] Refactor ability to put logic for model change and isDisabled outside of view and update
 - [ ] Add post-battle phase
 - [ ] Let player claim reward in post-battle phase
 - [ ] Let player remove cards in post-battle phase

@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import Browser
 import Html exposing (Html, button, div, h1, h2, hr, img, li, span, text, ul)
-import Html.Attributes exposing (class, src)
+import Html.Attributes exposing (class, disabled, src)
 import Html.Events exposing (onClick)
 import Random
 import Random.List
@@ -38,16 +38,18 @@ main =
 -- MODEL
 
 
+type alias ApplyAbility =
+    Model -> Model
+
+
 type Ability
-    = None
-    | HealingOne
-    | HealingTwo
+    = Ability String ApplyAbility
 
 
 type alias PlayerCard =
     { name : String
     , strength : Int
-    , ability : Ability
+    , ability : Maybe Ability
     , picture : String
     }
 
@@ -72,6 +74,16 @@ type alias Model =
     }
 
 
+healingOne : Ability
+healingOne =
+    Ability "Healing I" (\model -> { model | health = model.health + 1 })
+
+
+healingTwo : Ability
+healingTwo =
+    Ability "Healing II" (\model -> { model | health = model.health + 2 })
+
+
 init : () -> ( Model, Cmd Msg )
 init _ =
     let
@@ -81,10 +93,10 @@ init _ =
 
         playerDeck : List PlayerCard
         playerDeck =
-            [ { name = "Cigarette Man", strength = 2, ability = None, picture = "cigarette_man" }
-            , { name = "Finger Guns", strength = 0, ability = None, picture = "finger_guns" }
-            , { name = "Spellpeep", strength = 1, ability = HealingOne, picture = "spellpeep" }
-            , { name = "The Nose", strength = 0, ability = HealingTwo, picture = "the_nose" }
+            [ { name = "Cigarette Man", strength = 2, ability = Nothing, picture = "cigarette_man" }
+            , { name = "Finger Guns", strength = 0, ability = Nothing, picture = "finger_guns" }
+            , { name = "Spellpeep", strength = 1, ability = Just healingOne, picture = "spellpeep" }
+            , { name = "The Nose", strength = 0, ability = Just healingTwo, picture = "the_nose" }
             ]
 
         firstEnemy : EnemyCard
@@ -206,14 +218,11 @@ update msg model =
                 activateAbility : Model -> Model
                 activateAbility oldModel =
                     case card.ability of
-                        None ->
+                        Nothing ->
                             oldModel
 
-                        HealingOne ->
-                            { oldModel | health = oldModel.health + 1 }
-
-                        HealingTwo ->
-                            { oldModel | health = oldModel.health + 2 }
+                        Just (Ability _ applyAbility) ->
+                            applyAbility oldModel
 
                 newModel : Model
                 newModel =
@@ -341,14 +350,17 @@ renderPlayerContainer model =
                     , div [ class "card-info" ]
                         [ div [] [ text ("Stength: " ++ String.fromInt playerCard.strength) ]
                         , case playerCard.ability of
-                            None ->
+                            Nothing ->
                                 div [] []
 
-                            HealingOne ->
-                                div [] [ button [ onClick (ActivateCard playerCard) ] [ text "Heal I" ] ]
-
-                            HealingTwo ->
-                                div [] [ button [ onClick (ActivateCard playerCard) ] [ text "Heal II" ] ]
+                            Just (Ability abilityText _) ->
+                                div []
+                                    [ button
+                                        [ onClick (ActivateCard playerCard)
+                                        , disabled (List.member playerCard model.cardsUsed)
+                                        ]
+                                        [ text abilityText ]
+                                    ]
                         ]
                     ]
                 ]
