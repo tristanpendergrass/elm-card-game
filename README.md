@@ -33,5 +33,7 @@ $ npm run build
 - [x] Make heal ability work
 - [x] Refactor ability to put logic for model change and isDisabled outside of view and update
 - [ ] Add post-battle phase
+- [ ] Fix bug where tooltip persists after moving mouse off of target if you move mouse onto tooltip itself
+- [ ] Try out tailwindcss
 - [ ] Let player claim reward in post-battle phase
 - [ ] Let player remove cards in post-battle phase
