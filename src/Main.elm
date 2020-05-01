@@ -67,6 +67,11 @@ type alias FightModel =
     }
 
 
+type FightOutcome
+    = PlayerWon PlayerCard
+    | PlayerLost (List PlayerCard) (List PlayerCard)
+
+
 type alias RewardsModel =
     { seed : Random.Seed
     , playerDeck : List PlayerCard
@@ -74,11 +79,9 @@ type alias RewardsModel =
     , health : Int
     , enemyDeck : List EnemyCard
     , enemyDiscard : List EnemyCard
-    , playedCards : List PlayerCard
 
     -- other stuff
-    , fightOutcome : Int -- Non-negative -> player won; Netative -> player lost
-    , cardsToLose : List PlayerCard
+    , fightOutcome : FightOutcome
     }
 
 
@@ -100,6 +103,11 @@ healingOne =
 healingTwo : Ability
 healingTwo =
     Ability "Healing II" (\model -> { model | health = model.health + 2 })
+
+
+rewardCard : PlayerCard
+rewardCard =
+    { name = "Renee", strength = 4, ability = Nothing, picture = "renee" }
 
 
 init : () -> ( Model, Cmd Msg )
@@ -212,15 +220,22 @@ update msg topModel =
 
                         convertToRewardsModel : FightModel -> RewardsModel
                         convertToRewardsModel oldModel =
+                            let
+                                fightOutcome : FightOutcome
+                                fightOutcome =
+                                    if strengthDifference >= 0 then
+                                        PlayerLost oldModel.playedCards []
+
+                                    else
+                                        PlayerWon rewardCard
+                            in
                             { seed = oldModel.seed
                             , playerDeck = oldModel.playerDeck
                             , playerDiscard = oldModel.playerDiscard
                             , health = oldModel.health
                             , enemyDeck = oldModel.enemyDeck
                             , enemyDiscard = oldModel.enemyDiscard
-                            , playedCards = oldModel.playedCards
-                            , fightOutcome = -1 * strengthDifference
-                            , cardsToLose = []
+                            , fightOutcome = fightOutcome
                             }
 
                         newModel : RewardsModel
@@ -501,7 +516,8 @@ view topModel =
                         [ renderEnemyDiscard (List.length model.enemyDiscard)
                         , renderEnemyDeck (List.length model.enemyDeck)
                         ]
-                    , div [ class "button-container" ] []
+                    , div [ class "button-container" ]
+                        []
                     , div [ class "cards-container" ] []
                     ]
                 , div [ class "player-container" ]
@@ -510,7 +526,17 @@ view topModel =
                         , renderPlayerDiscard (List.length model.playerDiscard)
                         , renderPlayerHealth model.health
                         ]
-                    , div [ class "button-container" ] []
-                    , div [ class "cards-container" ] []
+                    , div [ class "button-container" ]
+                        [ button [ onClick NextBattle ] [ text "Next Battle" ]
+                        ]
+                    , div [ class "cards-container" ]
+                        (case model.fightOutcome of
+                            PlayerLost playedCards _ ->
+                                List.map (renderPlayerCard False) playedCards
+
+                            PlayerWon card ->
+                                [ renderPlayerCard False card
+                                ]
+                        )
                     ]
                 ]
