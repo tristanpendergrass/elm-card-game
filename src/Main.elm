@@ -8,6 +8,10 @@ import Random
 import Random.List
 
 
+
+-- Utils
+
+
 shuffleNonEmptyList : a -> List a -> Random.Generator ( a, List a )
 shuffleNonEmptyList top rest =
     Random.map
@@ -20,6 +24,11 @@ shuffleNonEmptyList top rest =
                     ( shuffledTop, shuffledRest )
         )
         (Random.List.shuffle (top :: rest))
+
+
+updatePhaseInModel : Model -> Phase -> Model
+updatePhaseInModel model phase =
+    { model | phase = phase }
 
 
 main : Program () Model Msg
@@ -173,142 +182,154 @@ type
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg topModel =
-    case topModel.phase of
-        FightPhase model ->
-            case msg of
-                EndBattle ->
+update msg model =
+    case model.phase of
+        FightPhase fightModel ->
+            updateFightPhase msg fightModel
+                |> Tuple.mapFirst (updatePhaseInModel model)
+
+        RewardsPhase rewardsModel ->
+            updateRewardsPhase msg rewardsModel
+                |> Tuple.mapFirst (updatePhaseInModel model)
+
+
+updateFightPhase : Msg -> FightModel -> ( Phase, Cmd Msg )
+updateFightPhase msg model =
+    case msg of
+        EndBattle ->
+            let
+                updateEnemyCards : FightModel -> FightModel
+                updateEnemyCards oldModel =
                     let
-                        updateEnemyCards : FightModel -> FightModel
-                        updateEnemyCards oldModel =
-                            let
-                                enemyDeck =
-                                    oldModel.enemyDeck
+                        enemyDeck =
+                            oldModel.enemyDeck
 
-                                enemyDiscard =
-                                    oldModel.currentEnemy :: oldModel.enemyDiscard
-                            in
-                            case ( enemyDeck, enemyDiscard ) of
-                                ( [], [] ) ->
-                                    oldModel
-
-                                ( topCard :: rest, _ ) ->
-                                    { oldModel | currentEnemy = topCard, enemyDeck = rest, enemyDiscard = enemyDiscard }
-
-                                ( [], topCard :: rest ) ->
-                                    let
-                                        ( ( drawnCard, newDeck ), newSeed ) =
-                                            Random.step (shuffleNonEmptyList topCard rest) oldModel.seed
-                                    in
-                                    { oldModel | seed = newSeed, currentEnemy = drawnCard, enemyDeck = newDeck, enemyDiscard = [] }
-
-                        updatePlayerCards : FightModel -> FightModel
-                        updatePlayerCards oldModel =
-                            { oldModel
-                                | playedCards = []
-                                , playerDiscard = List.append oldModel.playerDiscard oldModel.playedCards
-                            }
-
-                        strengthDifference : Int
-                        strengthDifference =
-                            model.currentEnemy.strength
-                                - List.sum (List.map .strength model.playedCards)
-
-                        updateHealth : FightModel -> FightModel
-                        updateHealth oldModel =
-                            { oldModel | health = model.health - strengthDifference }
-
-                        convertToRewardsModel : FightModel -> RewardsModel
-                        convertToRewardsModel oldModel =
-                            let
-                                fightOutcome : FightOutcome
-                                fightOutcome =
-                                    if strengthDifference >= 0 then
-                                        PlayerLost oldModel.playedCards []
-
-                                    else
-                                        PlayerWon rewardCard
-                            in
-                            { seed = oldModel.seed
-                            , playerDeck = oldModel.playerDeck
-                            , playerDiscard = oldModel.playerDiscard
-                            , health = oldModel.health
-                            , enemyDeck = oldModel.enemyDeck
-                            , enemyDiscard = oldModel.enemyDiscard
-                            , fightOutcome = fightOutcome
-                            }
-
-                        newModel : RewardsModel
-                        newModel =
-                            model
-                                |> updateEnemyCards
-                                |> updatePlayerCards
-                                |> updateHealth
-                                |> convertToRewardsModel
+                        enemyDiscard =
+                            oldModel.currentEnemy :: oldModel.enemyDiscard
                     in
-                    ( { topModel | phase = RewardsPhase newModel }, Cmd.none )
+                    case ( enemyDeck, enemyDiscard ) of
+                        ( [], [] ) ->
+                            oldModel
 
-                DrawCard ->
+                        ( topCard :: rest, _ ) ->
+                            { oldModel | currentEnemy = topCard, enemyDeck = rest, enemyDiscard = enemyDiscard }
+
+                        ( [], topCard :: rest ) ->
+                            let
+                                ( ( drawnCard, newDeck ), newSeed ) =
+                                    Random.step (shuffleNonEmptyList topCard rest) oldModel.seed
+                            in
+                            { oldModel | seed = newSeed, currentEnemy = drawnCard, enemyDeck = newDeck, enemyDiscard = [] }
+
+                updatePlayerCards : FightModel -> FightModel
+                updatePlayerCards oldModel =
+                    { oldModel
+                        | playedCards = []
+                        , playerDiscard = List.append oldModel.playerDiscard oldModel.playedCards
+                    }
+
+                strengthDifference : Int
+                strengthDifference =
+                    model.currentEnemy.strength
+                        - List.sum (List.map .strength model.playedCards)
+
+                updateHealth : FightModel -> FightModel
+                updateHealth oldModel =
+                    { oldModel | health = model.health - strengthDifference }
+
+                convertToRewardsModel : FightModel -> RewardsModel
+                convertToRewardsModel oldModel =
                     let
-                        { playerDeck, playerDiscard } =
-                            model
-
-                        newModel : FightModel
-                        newModel =
-                            case ( playerDeck, playerDiscard ) of
-                                ( [], [] ) ->
-                                    model
-
-                                ( topCard :: rest, _ ) ->
-                                    { model | playedCards = topCard :: model.playedCards, playerDeck = rest }
-
-                                ( [], topCard :: rest ) ->
-                                    let
-                                        ( ( drawnCard, newDeck ), newSeed ) =
-                                            Random.step (shuffleNonEmptyList topCard rest) model.seed
-                                    in
-                                    { model | seed = newSeed, playedCards = drawnCard :: model.playedCards, playerDeck = newDeck, playerDiscard = [] }
-                    in
-                    ( { topModel | phase = FightPhase newModel }, Cmd.none )
-
-                ActivateCard card ->
-                    let
-                        updateCardsUsed : FightModel -> FightModel
-                        updateCardsUsed oldModel =
-                            { oldModel | cardsUsed = card :: oldModel.cardsUsed }
-
-                        activateAbility : FightModel -> FightModel
-                        activateAbility oldModel =
-                            case card.ability of
-                                Nothing ->
-                                    oldModel
-
-                                Just (Ability _ applyAbility) ->
-                                    applyAbility oldModel
-
-                        newModel : FightModel
-                        newModel =
-                            if List.member card model.cardsUsed then
-                                model
+                        fightOutcome : FightOutcome
+                        fightOutcome =
+                            if strengthDifference >= 0 then
+                                PlayerLost oldModel.playedCards []
 
                             else
-                                model |> updateCardsUsed |> activateAbility
+                                PlayerWon rewardCard
                     in
-                    ( { topModel | phase = FightPhase newModel }, Cmd.none )
+                    { seed = oldModel.seed
+                    , playerDeck = oldModel.playerDeck
+                    , playerDiscard = oldModel.playerDiscard
+                    , health = oldModel.health
+                    , enemyDeck = oldModel.enemyDeck
+                    , enemyDiscard = oldModel.enemyDiscard
+                    , fightOutcome = fightOutcome
+                    }
 
-                _ ->
-                    ( topModel, Cmd.none )
+                newModel : RewardsModel
+                newModel =
+                    model
+                        |> updateEnemyCards
+                        |> updatePlayerCards
+                        |> updateHealth
+                        |> convertToRewardsModel
+            in
+            ( RewardsPhase newModel, Cmd.none )
 
-        RewardsPhase model ->
-            case msg of
-                NextBattle ->
-                    Debug.todo "Implement NextBattle"
+        DrawCard ->
+            let
+                { playerDeck, playerDiscard } =
+                    model
 
-                ToggleRemoveCard card ->
-                    Debug.todo "Implement ToggleRemoveCard"
+                newModel : FightModel
+                newModel =
+                    case ( playerDeck, playerDiscard ) of
+                        ( [], [] ) ->
+                            model
 
-                _ ->
-                    ( topModel, Cmd.none )
+                        ( topCard :: rest, _ ) ->
+                            { model | playedCards = topCard :: model.playedCards, playerDeck = rest }
+
+                        ( [], topCard :: rest ) ->
+                            let
+                                ( ( drawnCard, newDeck ), newSeed ) =
+                                    Random.step (shuffleNonEmptyList topCard rest) model.seed
+                            in
+                            { model | seed = newSeed, playedCards = drawnCard :: model.playedCards, playerDeck = newDeck, playerDiscard = [] }
+            in
+            ( FightPhase newModel, Cmd.none )
+
+        ActivateCard card ->
+            let
+                updateCardsUsed : FightModel -> FightModel
+                updateCardsUsed oldModel =
+                    { oldModel | cardsUsed = card :: oldModel.cardsUsed }
+
+                activateAbility : FightModel -> FightModel
+                activateAbility oldModel =
+                    case card.ability of
+                        Nothing ->
+                            oldModel
+
+                        Just (Ability _ applyAbility) ->
+                            applyAbility oldModel
+
+                newModel : FightModel
+                newModel =
+                    if List.member card model.cardsUsed then
+                        model
+
+                    else
+                        model |> updateCardsUsed |> activateAbility
+            in
+            ( FightPhase newModel, Cmd.none )
+
+        _ ->
+            ( FightPhase model, Cmd.none )
+
+
+updateRewardsPhase : Msg -> RewardsModel -> ( Phase, Cmd Msg )
+updateRewardsPhase msg model =
+    case msg of
+        NextBattle ->
+            Debug.todo "Implement NextBattle"
+
+        ToggleRemoveCard card ->
+            Debug.todo "Implement ToggleRemoveCard"
+
+        _ ->
+            ( RewardsPhase model, Cmd.none )
 
 
 
