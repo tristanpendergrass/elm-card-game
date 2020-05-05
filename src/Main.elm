@@ -1,9 +1,9 @@
 module Main exposing (main)
 
 import Browser
-import Html exposing (Html, button, div, h1, h2, hr, img, li, span, text, ul)
-import Html.Attributes exposing (class, disabled, src)
-import Html.Events exposing (onClick)
+import Html exposing (Html, button, div, h1, h2, hr, img, input, label, li, span, text, ul)
+import Html.Attributes exposing (checked, class, disabled, src, type_)
+import Html.Events exposing (onCheck, onClick)
 import Random
 import Random.List
 
@@ -121,7 +121,7 @@ defaultReward =
 
 defaultEnemy : EnemyCard
 defaultEnemy =
-    { name = "Grump", strength = 1, draws = 1 }
+    { name = "Grump", strength = 6, draws = 2 }
 
 
 init : () -> ( Model, Cmd Msg )
@@ -183,7 +183,7 @@ type
     | ActivateCard PlayerCard
       -- Rewards phase
     | NextBattle
-    | ToggleRemoveCard PlayerCard
+    | ToggleRemoveCard PlayerCard Bool
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -247,8 +247,8 @@ updateFightPhase msg model =
                     let
                         fightOutcome : FightOutcome
                         fightOutcome =
-                            if strengthDifference >= 0 then
-                                PlayerLost oldModel.playedCards []
+                            if strengthDifference > 0 then
+                                PlayerLost model.playedCards []
 
                             else
                                 PlayerWon defaultReward
@@ -369,15 +369,15 @@ updateRewardsPhase msg model =
             in
             ( FightPhase newModel, Cmd.none )
 
-        ToggleRemoveCard card ->
+        ToggleRemoveCard card isRemoved ->
             let
                 updateFightOutcome : List PlayerCard -> List PlayerCard -> FightOutcome
                 updateFightOutcome playedCards cardsToRemove =
-                    if List.member card cardsToRemove then
-                        PlayerLost playedCards (List.filter ((/=) card) cardsToRemove)
+                    if isRemoved then
+                        PlayerLost playedCards (card :: cardsToRemove)
 
                     else
-                        PlayerLost playedCards (card :: cardsToRemove)
+                        PlayerLost playedCards (List.filter ((/=) card) cardsToRemove)
 
                 newModel : RewardsModel
                 newModel =
@@ -520,6 +520,22 @@ renderPlayedCard isDisabled card =
         ]
 
 
+renderRemovableCard : Bool -> PlayerCard -> Html Msg
+renderRemovableCard isRemoved card =
+    div [ class "played-card" ]
+        [ renderPlayerCard card
+        , label []
+            [ text "Remove"
+            , input
+                [ type_ "checkbox"
+                , checked isRemoved
+                , onCheck (ToggleRemoveCard card)
+                ]
+                []
+            ]
+        ]
+
+
 renderPlayerCard : PlayerCard -> Html Msg
 renderPlayerCard playerCard =
     div [ class "card player-card" ]
@@ -621,8 +637,8 @@ view topModel =
                         ]
                     , div [ class "cards-container" ]
                         (case model.fightOutcome of
-                            PlayerLost playedCards _ ->
-                                List.map renderPlayerCard playedCards
+                            PlayerLost playedCards cardsToRemove ->
+                                List.map (\card -> renderRemovableCard (List.member card cardsToRemove) card) playedCards
 
                             PlayerWon card ->
                                 [ renderPlayerCard card
