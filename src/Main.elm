@@ -114,9 +114,14 @@ healingTwo =
     Ability "Healing II" (\model -> { model | health = model.health + 2 })
 
 
-rewardCard : PlayerCard
-rewardCard =
+defaultReward : PlayerCard
+defaultReward =
     { name = "Renee", strength = 4, ability = Nothing, picture = "renee" }
+
+
+defaultEnemy : EnemyCard
+defaultEnemy =
+    { name = "Grump", strength = 1, draws = 1 }
 
 
 init : () -> ( Model, Cmd Msg )
@@ -136,7 +141,7 @@ init _ =
 
         firstEnemy : EnemyCard
         firstEnemy =
-            { name = "Grump", strength = 1, draws = 1 }
+            defaultEnemy
 
         enemyDeck : List EnemyCard
         enemyDeck =
@@ -246,7 +251,7 @@ updateFightPhase msg model =
                                 PlayerLost oldModel.playedCards []
 
                             else
-                                PlayerWon rewardCard
+                                PlayerWon defaultReward
                     in
                     { seed = oldModel.seed
                     , playerDeck = oldModel.playerDeck
@@ -323,10 +328,67 @@ updateRewardsPhase : Msg -> RewardsModel -> ( Phase, Cmd Msg )
 updateRewardsPhase msg model =
     case msg of
         NextBattle ->
-            Debug.todo "Implement NextBattle"
+            let
+                ( ( drawnEnemy, newDeck ), nextSeed ) =
+                    case ( model.enemyDeck, model.enemyDiscard ) of
+                        ( [], [] ) ->
+                            ( ( defaultEnemy, [] ), model.seed )
+
+                        ( topCard :: rest, _ ) ->
+                            ( ( topCard, rest ), model.seed )
+
+                        ( [], topCard :: rest ) ->
+                            Random.step (shuffleNonEmptyList topCard rest) model.seed
+
+                newPlayerDiscard : List PlayerCard
+                newPlayerDiscard =
+                    case model.fightOutcome of
+                        PlayerLost playedCards cardsToRemove ->
+                            List.append
+                                model.playerDiscard
+                                (List.filter
+                                    (\card -> not (List.member card cardsToRemove))
+                                    playedCards
+                                )
+
+                        PlayerWon rewardCard ->
+                            rewardCard :: model.playerDiscard
+
+                newModel : FightModel
+                newModel =
+                    { seed = nextSeed
+                    , playerDeck = model.playerDeck
+                    , playerDiscard = newPlayerDiscard
+                    , health = model.health
+                    , enemyDeck = newDeck
+                    , enemyDiscard = model.enemyDiscard
+                    , currentEnemy = drawnEnemy
+                    , cardsUsed = []
+                    , playedCards = []
+                    }
+            in
+            ( FightPhase newModel, Cmd.none )
 
         ToggleRemoveCard card ->
-            Debug.todo "Implement ToggleRemoveCard"
+            let
+                updateFightOutcome : List PlayerCard -> List PlayerCard -> FightOutcome
+                updateFightOutcome playedCards cardsToRemove =
+                    if List.member card cardsToRemove then
+                        PlayerLost playedCards (List.filter ((/=) card) cardsToRemove)
+
+                    else
+                        PlayerLost playedCards (card :: cardsToRemove)
+
+                newModel : RewardsModel
+                newModel =
+                    case model.fightOutcome of
+                        PlayerWon _ ->
+                            model
+
+                        PlayerLost playedCards cardsToRemove ->
+                            { model | fightOutcome = updateFightOutcome playedCards cardsToRemove }
+            in
+            ( RewardsPhase newModel, Cmd.none )
 
         _ ->
             ( RewardsPhase model, Cmd.none )
