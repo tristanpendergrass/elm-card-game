@@ -501,8 +501,27 @@ renderPlayerDiscard count =
         ]
 
 
-renderPlayerCard : Bool -> PlayerCard -> Html Msg
-renderPlayerCard isDisabled playerCard =
+renderPlayedCard : Bool -> PlayerCard -> Html Msg
+renderPlayedCard isDisabled card =
+    div [ class "played-card" ]
+        [ renderPlayerCard card
+        , case card.ability of
+            Nothing ->
+                div [] []
+
+            Just (Ability abilityText _) ->
+                div []
+                    [ button
+                        [ onClick (ActivateCard card)
+                        , disabled isDisabled
+                        ]
+                        [ text abilityText ]
+                    ]
+        ]
+
+
+renderPlayerCard : PlayerCard -> Html Msg
+renderPlayerCard playerCard =
     div [ class "card player-card" ]
         [ div [ class "border" ] []
         , div [ class "card-top" ] [ text playerCard.name ]
@@ -510,18 +529,6 @@ renderPlayerCard isDisabled playerCard =
             [ img [ class "card-picture", src ("./" ++ playerCard.picture ++ ".png") ] []
             , div [ class "card-info" ]
                 [ div [] [ text ("Stength: " ++ String.fromInt playerCard.strength) ]
-                , case playerCard.ability of
-                    Nothing ->
-                        div [] []
-
-                    Just (Ability abilityText _) ->
-                        div []
-                            [ button
-                                [ onClick (ActivateCard playerCard)
-                                , disabled isDisabled
-                                ]
-                                [ text abilityText ]
-                            ]
                 ]
             ]
         ]
@@ -576,7 +583,7 @@ renderPlayerContainer model =
         , div [ class "cards-container" ]
             (List.map
                 (\card ->
-                    renderPlayerCard (List.member card model.cardsUsed) card
+                    renderPlayedCard (List.member card model.cardsUsed) card
                 )
                 model.playedCards
             )
@@ -615,10 +622,10 @@ view topModel =
                     , div [ class "cards-container" ]
                         (case model.fightOutcome of
                             PlayerLost playedCards _ ->
-                                List.map (renderPlayerCard False) playedCards
+                                List.map renderPlayerCard playedCards
 
                             PlayerWon card ->
-                                [ renderPlayerCard False card
+                                [ renderPlayerCard card
                                 ]
                         )
                     ]
