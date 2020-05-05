@@ -28,12 +28,11 @@ $ npm run build
 - [x] Redo player container
 - [x] Add visuals for player and enemy strength
 - [x] Display player health on left hand side
-- [ ] Icons for strength, draws
 - [x] Add card art for player cards
 - [x] Make heal ability work
 - [x] Refactor ability to put logic for model change and isDisabled outside of view and update
 - [x] Add post-battle phase
-- [ ] Add toggle remove card button
+- [x] Add toggle remove card button
 - [ ] Try out tailwindcss
 - [ ] Let player claim reward in post-battle phase
 - [ ] Let player remove cards in post-battle phase
