@@ -552,13 +552,13 @@ renderPlayerCard playerCard =
 
 renderPlayerHealth : Int -> Html Msg
 renderPlayerHealth health =
-    div [ class "player-health-container tooltip" ]
+    div [ class "bg-orange-500 p-2 rounded-md grid shadow-md tooltip" ]
         [ span [ class "tooltip-text" ] [ text "Lose it all and your guys will get really sad" ]
-        , div [ class "player-health" ]
+        , div []
             [ img [ src "./morale_icon.png" ] []
-            , div [ class "player-health-text" ]
-                [ div [ class "morale" ] [ text "Morale" ]
-                , div [ class "health-number" ] [ text (String.fromInt health) ]
+            , div [ class "text-center" ]
+                [ div [ class "font-bold" ] [ text "Morale" ]
+                , div [ class "text-lg" ] [ text (String.fromInt health) ]
                 ]
             ]
         ]

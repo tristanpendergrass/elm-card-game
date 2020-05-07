@@ -33,6 +33,9 @@ $ npm run build
 - [x] Refactor ability to put logic for model change and isDisabled outside of view and update
 - [x] Add post-battle phase
 - [x] Add toggle remove card button
-- [ ] Try out tailwindcss
-- [ ] Let player claim reward in post-battle phase
-- [ ] Let player remove cards in post-battle phase
+- [x] Try out tailwindcss
+- [x] Let player claim reward in post-battle phase
+- [x] Let player remove cards in post-battle phase
+- [ ] Convert all css to tailwindcss
+- [ ] Wire up different rewards for different enemies
+- [ ] Have button to show reward
