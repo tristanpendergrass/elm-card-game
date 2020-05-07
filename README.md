@@ -37,5 +37,10 @@ $ npm run build
 - [x] Let player claim reward in post-battle phase
 - [x] Let player remove cards in post-battle phase
 - [ ] Convert all css to tailwindcss
+  - [x] Convert morale
+  - [x] Convert cards
+  - [ ] Convert buttons
+  - [ ] Convert deck/discard
+  - [ ] Convert layout
 - [ ] Wire up different rewards for different enemies
 - [ ] Have button to show reward

@@ -12,6 +12,11 @@ import Random.List
 -- Utils
 
 
+buttonClass : String
+buttonClass =
+    "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounde"
+
+
 shuffleNonEmptyList : a -> List a -> Random.Generator ( a, List a )
 shuffleNonEmptyList top rest =
     Random.map
@@ -431,16 +436,11 @@ renderEnemyDiscard count =
 
 renderEnemyCard : EnemyCard -> Html Msg
 renderEnemyCard enemy =
-    div [ class "card enemy-card" ]
-        [ div [ class "border" ] []
-        , div [ class "card-top" ] [ text enemy.name ]
-        , div [ class "card-bottom" ]
-            [ img [ class "card-picture", src "./monster_icon.png" ] []
-            , div [ class "card-info" ]
-                [ div [] [ text ("Stength: " ++ String.fromInt enemy.strength) ]
-                , div [] [ text ("Draws: " ++ String.fromInt enemy.draws) ]
-                ]
-            ]
+    div [ class "card border-solid border-2 border-black rounded-lg text-center p-2" ]
+        [ div [ class "text-center text-2xl my-2" ] [ text enemy.name ]
+        , img [ class "border-black border-2", src "./monster_icon.png" ] []
+        , div [] [ text ("Stength: " ++ String.fromInt enemy.strength) ]
+        , div [] [ text ("Draws: " ++ String.fromInt enemy.draws) ]
         ]
 
 
@@ -538,15 +538,10 @@ renderRemovableCard isRemoved card =
 
 renderPlayerCard : PlayerCard -> Html Msg
 renderPlayerCard playerCard =
-    div [ class "card player-card" ]
-        [ div [ class "border" ] []
-        , div [ class "card-top" ] [ text playerCard.name ]
-        , div [ class "card-bottom" ]
-            [ img [ class "card-picture", src ("./" ++ playerCard.picture ++ ".png") ] []
-            , div [ class "card-info" ]
-                [ div [] [ text ("Stength: " ++ String.fromInt playerCard.strength) ]
-                ]
-            ]
+    div [ class "card border-solid border-2 border-black rounded-lg text-center p-2" ]
+        [ div [ class "text-center text-2xl my-2" ] [ text playerCard.name ]
+        , img [ class "border-black border-2", src ("./" ++ playerCard.picture ++ ".png") ] []
+        , div [] [ text ("Stength: " ++ String.fromInt playerCard.strength) ]
         ]
 
 

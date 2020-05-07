@@ -38,41 +38,8 @@ body {
 }
 
 .card {
-  $width: 200px;
-  $height: 300px;
-
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: $width;
-  height: $height;
-  border: 1px solid black;
-  border-radius: 8px;
-  padding: 10px;
-  box-sizing: border-box;
-
-  .border {
-    position: absolute;
-    top: 0;
-    $border-width: 5px;
-    width: $width;
-    height: $height;
-    border: $border-width solid $enemy-color;
-    background-color: transparent;
-    z-index: -1;
-    border-radius: 8px;
-  }
-  .card-top {
-    font-size: 2em;
-  }
-  .card-bottom {
-    .card-picture {
-      width: 175px;
-      height: 175px;
-      border: 2px solid black;
-    }
-  }
+  width: 200px;
+  height: 300px;
 }
 
 .deck-container {
