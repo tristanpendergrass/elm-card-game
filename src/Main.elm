@@ -457,7 +457,11 @@ renderEnemyContainer model =
             , renderEnemyDeck (List.length model.enemyDeck)
             ]
         , div [ class "button-container" ]
-            [ button [ onClick EndBattle ] [ text "End Battle" ]
+            [ button
+                [ class "bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded shadow"
+                , onClick EndBattle
+                ]
+                [ text "End Battle" ]
             , div [ class "tooltip" ]
                 [ div [ class "tooltip-text" ] [ text "Enemy Strength" ]
                 , div
@@ -567,6 +571,10 @@ renderPlayerContainer model =
             model.playedCards
                 |> List.map .strength
                 |> List.sum
+
+        drawDisabled : Bool
+        drawDisabled =
+            List.isEmpty model.playerDeck && List.isEmpty model.playerDiscard
     in
     div [ class "player-container" ]
         [ div [ class "info-container" ]
@@ -589,7 +597,17 @@ renderPlayerContainer model =
                     ]
                     [ text (String.fromInt strength) ]
                 ]
-            , button [ onClick DrawCard ] [ text "Draw Card" ]
+            , button
+                [ class
+                    (if drawDisabled then
+                        "bg-green-500 text-white font-bold py-2 px-4 rounded opacity-50"
+
+                     else
+                        "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded shadow"
+                    )
+                , onClick DrawCard
+                ]
+                [ text "Draw Card" ]
             ]
         , div [ class "cards-container" ]
             (List.map
@@ -628,7 +646,11 @@ view topModel =
                         , renderPlayerHealth model.health
                         ]
                     , div [ class "button-container" ]
-                        [ button [ onClick NextBattle ] [ text "Next Battle" ]
+                        [ button
+                            [ class "bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded shadow"
+                            , onClick NextBattle
+                            ]
+                            [ text "Next Battle" ]
                         ]
                     , div [ class "cards-container" ]
                         (case model.fightOutcome of

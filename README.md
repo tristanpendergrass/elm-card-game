@@ -39,7 +39,7 @@ $ npm run build
 - [ ] Convert all css to tailwindcss
   - [x] Convert morale
   - [x] Convert cards
-  - [ ] Convert buttons
+  - [x] Convert buttons
   - [ ] Convert deck/discard
   - [ ] Convert layout
 - [ ] Wire up different rewards for different enemies
