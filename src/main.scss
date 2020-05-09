@@ -43,7 +43,8 @@ body {
 }
 
 .deck-container {
-  position: relative;
+  width: 50px;
+  height: 75px;
 
   .deck-count {
     $width: 30px;
@@ -60,39 +61,42 @@ body {
     font-weight: bold;
     background-color: white;
   }
-
-  .deck-image {
-    width: 50px;
-    height: 75px;
-    border: 1px solid black;
-    border-radius: 5px;
-
-    &.enemy-deck {
-      background-color: $enemy-color;
-    }
-
-    &.player-deck {
-      background-color: $player-color;
-    }
-
-    img {
-      width: 50px;
-      height: 100px;
-    }
-
-    &.discard {
-      border: 1px dashed black;
-
-      &.enemy-deck {
-        background-color: lighten($enemy-color, 30%);
-      }
-
-      &.player-deck {
-        background-color: lighten($player-color, 30%);
-      }
-    }
-  }
 }
+// .deck-container {
+//   position: relative;
+
+//   .deck-image {
+//     width: 50px;
+//     height: 75px;
+//     border: 1px solid black;
+//     border-radius: 5px;
+
+//     &.enemy-deck {
+//       background-color: $enemy-color;
+//     }
+
+//     &.player-deck {
+//       background-color: $player-color;
+//     }
+
+//     img {
+//       width: 50px;
+//       height: 100px;
+//     }
+
+//     &.discard {
+//       border: 1px dashed black;
+
+//       &.enemy-deck {
+//         background-color: lighten($enemy-color, 30%);
+//       }
+
+//       &.player-deck {
+//         background-color: lighten($player-color, 30%);
+//       }
+//     }
+//   }
+// }
 
 .player-container,
 .enemy-container {

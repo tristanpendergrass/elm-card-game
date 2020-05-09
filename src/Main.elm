@@ -412,9 +412,14 @@ subscriptions _ =
 -- VIEW
 
 
+deckContainerClass : String
+deckContainerClass =
+    "relative"
+
+
 renderEnemyDeck : Int -> Html Msg
 renderEnemyDeck count =
-    div [ class "deck-container" ]
+    div [ class deckContainerClass ]
         [ div [ class "deck-count tooltip" ]
             [ span [] [ text (String.fromInt count) ]
             , span [ class "tooltip-text" ] [ text "Cards in enemy deck" ]
@@ -425,7 +430,7 @@ renderEnemyDeck count =
 
 renderEnemyDiscard : Int -> Html Msg
 renderEnemyDiscard count =
-    div [ class "deck-container" ]
+    div [ class deckContainerClass ]
         [ div [ class "deck-count tooltip" ]
             [ span [] [ text (String.fromInt count) ]
             , span [ class "tooltip-text" ] [ text "Cards in enemy discard pile" ]
@@ -485,7 +490,7 @@ renderEnemyContainer model =
 
 renderPlayerDeck : Int -> Html Msg
 renderPlayerDeck count =
-    div [ class "deck-container" ]
+    div [ class deckContainerClass ]
         [ div [ class "deck-count tooltip" ]
             [ span [] [ text (String.fromInt count) ]
             , span [ class "tooltip-text" ] [ text "Cards in enemy deck" ]
@@ -496,7 +501,7 @@ renderPlayerDeck count =
 
 renderPlayerDiscard : Int -> Html Msg
 renderPlayerDiscard count =
-    div [ class "deck-container" ]
+    div [ class deckContainerClass ]
         [ div [ class "deck-count tooltip" ]
             [ span [] [ text (String.fromInt count) ]
             , span [ class "tooltip-text" ] [ text "Cards in enemy discard pile" ]
